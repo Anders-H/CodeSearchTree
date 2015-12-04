@@ -35,7 +35,14 @@ Get class node from file:
 
 ```C#
 var code_tree = CodeSearchTree.Node.CreateTreeFromFile(filename);
-var my_class = "ns/cls";
+var my_class = code_tree.GetChild("ns/cls");
+```
+
+Acquire a child node, regardless of type, named Main and display its source.
+
+```C#
+var main = my_class.GetChild("*[Main]");
+Console.WriteLine(main.Source);
 ```
 
 Search for file that contains node a class named MyClass:
