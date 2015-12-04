@@ -35,7 +35,7 @@ Get class node from file:
 
 ```C#
 var code_tree = CodeSearchTree.Node.CreateTreeFromFile(filename);
-Var my_class = "ns/cls";
+var my_class = "ns/cls";
 ```
 
 Search for file that contains node a class named MyClass:
