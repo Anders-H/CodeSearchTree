@@ -1,0 +1,5 @@
+C:\Jobb\TS-Compiler\CodeSearchTree\CodeSearchTreeTest\obj\Debug\CodeSearchTreeTest.csprojResolveAssemblyReference.cache
+C:\Jobb\TS-Compiler\CodeSearchTree\CodeSearchTreeTest\obj\Debug\CodeSearchTreeTest.Form1.resources
+C:\Jobb\TS-Compiler\CodeSearchTree\CodeSearchTreeTest\obj\Debug\CodeSearchTreeTest.Properties.Resources.resources
+C:\Jobb\TS-Compiler\CodeSearchTree\CodeSearchTreeTest\obj\Debug\CodeSearchTreeTest.csproj.GenerateResource.Cache
+C:\Jobb\TS-Compiler\CodeSearchTree\CodeSearchTreeTest\bin\Debug\CodeSearchTreeTest.exe.config
