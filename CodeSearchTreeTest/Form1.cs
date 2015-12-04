@@ -277,7 +277,7 @@ C# EXAMPLES
 Get class node from file:
 
    var code_tree = CodeSearchTree.Node.CreateTreeFromFile(filename);
-   var my_class = ""ns/cls"";
+   var my_class = code_tree.GetChild(""ns/cls"");
 
 Search for file that contains node a class named MyClass:
 
