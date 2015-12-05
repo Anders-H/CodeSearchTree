@@ -69,7 +69,7 @@ namespace CodeSearchTreeTest
          }
 
          //Får inte innehålla några unknowns.
-         if (nodes.Exists(x => x.NodeType == CodeSearchTree.Node.NodeTypes.UnknownNode))
+         if (nodes.Exists(x => x.NodeType == CodeSearchTree.NodeType.UnknownNode))
          {
             MessageBox.Show("Search expression has an unknown node type.", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;

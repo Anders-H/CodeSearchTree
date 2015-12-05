@@ -1,33 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace CodeSearchTree
 {
-   public class Property
-   {
-      public string PropertyName { get; private set; }
-      public object PropertyValue { get; private set; }
+    public class Property
+    {
+        internal Property(string name, object value)
+        {
+            PropertyName = name;
+            PropertyValue = value;
+        }
 
-      internal Property(string name, object value)
-      {
-         this.PropertyName = name;
-         this.PropertyValue = value;
-      }
+        public string PropertyName { get; }
+        public object PropertyValue { get; }
 
-      public string PropertyValueString
-      {
-         get
-         {
-            var prop_value_string = this.PropertyValue == null ? "" : this.PropertyValue.ToString();
-            prop_value_string = System.Text.RegularExpressions.Regex.Replace(prop_value_string, @"\s+", " ").Trim();
-            return prop_value_string.Length > 200 ? (prop_value_string.Substring(0, 200).Trim() + "...") : prop_value_string;
-         }
-      }
+        public string PropertyValueString
+        {
+            get
+            {
+                var propValueString = PropertyValue?.ToString() ?? "";
+                propValueString = Regex.Replace(propValueString, @"\s+", " ").Trim();
+                return propValueString.Length > 200
+                    ? propValueString.Substring(0, 200).Trim() + "..."
+                    : propValueString;
+            }
+        }
 
-      public override string ToString() => $"{this.PropertyName}: {this.PropertyValueString}";
-
-   }
+        public override string ToString() => $"{PropertyName}: {PropertyValueString}";
+    }
 }
