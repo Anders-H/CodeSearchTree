@@ -1,36 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CodeSearchTree
+﻿namespace CodeSearchTree
 {
-   public class SearchNode
-   {
-      public Node.NodeTypes NodeType { get; set; }
-      public int Index { get; set; }
-      public string Name { get; set; }
+    public class SearchNode
+    {
+        public SearchNode(NodeType nodeType)
+        {
+            NodeType = nodeType;
+            Index = -1;
+            Name = "";
+        }
 
-      public SearchNode(Node.NodeTypes node_type)
-      {
-         this.NodeType = node_type;
-         this.Index = -1;
-         this.Name = "";
-      }
+        public SearchNode(NodeType nodeType, int index)
+        {
+            NodeType = nodeType;
+            Index = index;
+            Name = "";
+        }
 
-      public SearchNode(Node.NodeTypes node_type, int index)
-      {
-         this.NodeType = node_type;
-         this.Index = index;
-         this.Name = "";
-      }
+        public SearchNode(NodeType nodeType, string name)
+        {
+            NodeType = nodeType;
+            Index = -1;
+            Name = name;
+        }
 
-      public SearchNode(Node.NodeTypes node_type, string name)
-      {
-         this.NodeType = node_type;
-         this.Index = -1;
-         this.Name = name;
-      }
-   }
+        public NodeType NodeType { get; set; }
+        public int Index { get; set; }
+        public string Name { get; set; }
+    }
 }
