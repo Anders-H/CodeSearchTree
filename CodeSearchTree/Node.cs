@@ -17,6 +17,9 @@ namespace CodeSearchTree
         [Category("Relatives"), Description("List of child nodes.")]
         public NodeList Children { get; } = new NodeList();
 
+        [Category("Main"), Description("Return type name")]
+        public string ReturnTypeName { get; internal set; } = "";
+
         [Category("Main"), Description("Original source code.")]
         public string Source { get; internal set; }
 
@@ -156,7 +159,9 @@ namespace CodeSearchTree
             }
             //First iteration: Read out names.
             ret.ForEach(x => x.CheckName());
-            //Second iteration: Read out attribute names. No support for parameters.
+            //Second iteration: Read out property types and method return types.
+            ret.ForEach(x => x.CheckReturnType());
+            //Third iteration: Read out attribute names. No support for parameters.
             ret.ForEach(x => x.CheckAttributes());
             return ret;
         }
@@ -202,6 +207,20 @@ namespace CodeSearchTree
                 Name = "";
             foreach (var child in Children)
                 child.CheckName();
+        }
+
+        private void CheckReturnType()
+        {
+            var n = RoslynNode as SyntaxNode;
+            if (n != null)
+            {
+                if (n is GenericNameSyntax)
+                    Parent.ReturnTypeName = (n as GenericNameSyntax)?.ToString();
+                else if (n is PredefinedTypeSyntax)
+                    Parent.ReturnTypeName = (n as PredefinedTypeSyntax)?.ToString();
+            }
+            foreach (var child in Children)
+                child.CheckReturnType();
         }
 
         private void CheckAttributes()
