@@ -92,6 +92,7 @@
         BaseExpressionSyntaxNode,
         AttributeTargetSpecifierSyntaxNode,
         AliasQualifiedNameSyntaxNode,
-        ExplicitInterfaceSpecifierSyntaxNode
-    }
+        ExplicitInterfaceSpecifierSyntaxNode,
+        CatchDeclarationSyntaxNode
+   }
 }

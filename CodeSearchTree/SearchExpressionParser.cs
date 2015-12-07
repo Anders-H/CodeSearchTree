@@ -300,6 +300,9 @@ namespace CodeSearchTree
                 case "explicitinterfacespecifier":
                 case "explicit_interface_specifier":
                     return NodeType.ExplicitInterfaceSpecifierSyntaxNode;
+                case "catchdeclaration":
+                case "catch_declaration":
+                    return NodeType.CatchDeclarationSyntaxNode;
                 default:
                     return NodeType.UnknownNode;
             }
@@ -487,6 +490,8 @@ namespace CodeSearchTree
                     return "alias";
                 case NodeType.ExplicitInterfaceSpecifierSyntaxNode:
                     return "explicitinterfacespecifier";
+                case NodeType.CatchDeclarationSyntaxNode:
+                    return "catchdeclaration";
                 default:
                     throw new Exception("Jag fattar inget.");
             }

@@ -176,6 +176,10 @@ namespace CodeSearchTree
                     else
                         Name = (id.RoslynNode as QualifiedNameSyntax).ToString();
                 }
+                else if (n is AttributeSyntax)
+                {
+                    Name = (n as AttributeSyntax)?.Name.ToString() ?? "";
+                }
             }
             if (string.IsNullOrWhiteSpace(Name))
                 Name = "";
@@ -496,6 +500,8 @@ namespace CodeSearchTree
                 return NodeType.AliasQualifiedNameSyntaxNode;
             if (n is ExplicitInterfaceSpecifierSyntax)
                 return NodeType.ExplicitInterfaceSpecifierSyntaxNode;
+            if (n is CatchDeclarationSyntax)
+                return NodeType.CatchDeclarationSyntaxNode;
 #if DEBUG
             Console.WriteLine(n.GetType().Name);
             var code = n.ToString().Length > 40 ? n.ToString().Substring(0, 40) : n.ToString();
