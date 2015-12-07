@@ -177,13 +177,15 @@ namespace CodeSearchTree
                     Name = (n as NamespaceDeclarationSyntax).Name.ToString();
                 else if (n is FieldDeclarationSyntax)
                 {
-                    var v = GetChild("vardeclaration/id");
-                    Name = (v?.RoslynNode as IdentifierNameSyntax)?.ToString() ?? "";
+                    //TODO: Extract field name.
                 }
-                else if (n is VariableDeclarationSyntax || n is PropertyDeclarationSyntax)
+                else if (n is PropertyDeclarationSyntax)
+                    Name = (n as PropertyDeclarationSyntax)?.Identifier.ToString() ?? "";
+                else if (n is VariableDeclarationSyntax)
                 {
-                    var v = GetChild("id");
-                    Name = (v?.RoslynNode as IdentifierNameSyntax)?.ToString() ?? "";
+                    var vars = (n as VariableDeclarationSyntax).Variables;
+                    if (vars.Count > 0)
+                        Name = vars.First().Identifier.ToString();
                 }
                 else if (n is IdentifierNameSyntax)
                     Name = n.ToString();
@@ -218,6 +220,8 @@ namespace CodeSearchTree
                     Parent.ReturnTypeName = (n as GenericNameSyntax)?.ToString();
                 else if (n is PredefinedTypeSyntax)
                     Parent.ReturnTypeName = (n as PredefinedTypeSyntax)?.ToString();
+                else if (n is IdentifierNameSyntax)
+                    Parent.ReturnTypeName = (n as IdentifierNameSyntax)?.ToString();
             }
             foreach (var child in Children)
                 child.CheckReturnType();
