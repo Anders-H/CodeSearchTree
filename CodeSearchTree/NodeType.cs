@@ -93,6 +93,12 @@
         AttributeTargetSpecifierSyntaxNode,
         AliasQualifiedNameSyntaxNode,
         ExplicitInterfaceSpecifierSyntaxNode,
-        CatchDeclarationSyntaxNode
-   }
+        CatchDeclarationSyntaxNode,
+        ArrowExpressionClauseSyntaxNode,
+        ConditionalAccessExpressionSyntaxNode,
+        MemberBindingExpressionSyntaxNode,
+        InterpolatedStringExpressionSyntaxNode,
+        InterpolationSyntaxNode,
+        InterpolatedStringTextSyntaxNode
+    }
 }

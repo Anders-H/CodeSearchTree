@@ -14,7 +14,8 @@
             DisabledTextTriviaType,
             ElseDirectiveTriviaType,
             PragmaChecksumDirectiveTriviaType,
-            LineDirectiveTriviaType
+            LineDirectiveTriviaType,
+            EndIfDirectiveTriviaType
         }
 
         internal Trivia() : this(TriviaTypes.UnknownTriviaSyntaxType, "")

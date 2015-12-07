@@ -303,6 +303,23 @@ namespace CodeSearchTree
                 case "catchdeclaration":
                 case "catch_declaration":
                     return NodeType.CatchDeclarationSyntaxNode;
+                case "arrowexpression":
+                case "arrow_expression":
+                    return NodeType.ArrowExpressionClauseSyntaxNode;
+                case "conditionalaccess":
+                case "conditional_access":
+                    return NodeType.ConditionalAccessExpressionSyntaxNode;
+                case "memberbinding":
+                case "member_binding":
+                    return NodeType.MemberBindingExpressionSyntaxNode;
+                case "interpolatedstring":
+                case "interpolated_string":
+                    return NodeType.InterpolatedStringExpressionSyntaxNode;
+                case "interpolation":
+                    return NodeType.InterpolationSyntaxNode;
+                case "interpolatedtext":
+                case "interpolated_text":
+                    return NodeType.InterpolatedStringTextSyntaxNode;
                 default:
                     return NodeType.UnknownNode;
             }
@@ -492,6 +509,18 @@ namespace CodeSearchTree
                     return "explicitinterfacespecifier";
                 case NodeType.CatchDeclarationSyntaxNode:
                     return "catchdeclaration";
+                case NodeType.ArrowExpressionClauseSyntaxNode:
+                    return "arrowexpression";
+                case NodeType.ConditionalAccessExpressionSyntaxNode:
+                    return "conditionalaccess";
+                case NodeType.MemberBindingExpressionSyntaxNode:
+                    return "memberbinding";
+                case NodeType.InterpolatedStringExpressionSyntaxNode:
+                    return "interpolatedstring";
+                case NodeType.InterpolationSyntaxNode:
+                    return "interpolation";
+                case NodeType.InterpolatedStringTextSyntaxNode:
+                    return "interpolatedtext";
                 default:
                     throw new Exception("Jag fattar inget.");
             }

@@ -15,7 +15,7 @@ namespace CodeSearchTree
         public NodeType NodeType { get; internal set; }
 
         [Category("Relatives"), Description("List of child nodes.")]
-        public NodeList Children { get; }
+        public NodeList Children { get; } = new NodeList();
 
         [Category("Main"), Description("Original source code.")]
         public string Source { get; internal set; }
@@ -27,10 +27,10 @@ namespace CodeSearchTree
         public int EndPosition { get; internal set; }
 
         [Category("Meta"), Description("List of leading trivia.")]
-        public TriviaList LeadingTrivia { get; }
+        public TriviaList LeadingTrivia { get; } = new TriviaList();
 
         [Category("Meta"), Description("List of trailing trivia.")]
-        public TriviaList TrailingTrivia { get; }
+        public TriviaList TrailingTrivia { get; } = new TriviaList();
 
         [Category("Meta"), Description("Name or identifier of node.")]
         public string Name { get; private set; }
@@ -39,6 +39,10 @@ namespace CodeSearchTree
         public Node Parent { get; }
 
         internal NodeList ParentListIfNoParent { get; set; }
+
+        [Category("Meta"), Description("List of attributes.")]
+        public List<string> Attributes { get; private set; } = new List<string>();
+
         public object RoslynNode { get; }
 
         protected internal Node(object roslynNode, string source)
@@ -52,9 +56,6 @@ namespace CodeSearchTree
             StartPosition = (roslynNode as SyntaxNode).FullSpan.Start;
             EndPosition = (roslynNode as SyntaxNode).FullSpan.End;
             NodeType = node_type;
-            Children = new NodeList();
-            LeadingTrivia = new TriviaList();
-            TrailingTrivia = new TriviaList();
             Parent = parent;
             Source = source;
         }
@@ -67,6 +68,22 @@ namespace CodeSearchTree
 
         [Category("Relatives"), Description("Type of parant node, if available.")]
         public NodeType ParentType => Parent?.NodeType ?? NodeType.UnknownNode;
+
+        [Category("Meta"), Description("Strign representing list of attributes.")]
+        public string AttributesString
+        {
+            get
+            {
+                if (Attributes.Count == 0)
+                    return "";
+                else
+                {
+                    var s = new StringBuilder();
+                    Attributes.ForEach(x => s.Append($"{x}{(x == Attributes.Last() ? "" : ", ")}"));
+                    return s.ToString();
+                }
+            }
+        }
 
         [Category("Meta"), Description("String representation of leading trivia.")]
         public string LeadingTriviaString
@@ -137,8 +154,10 @@ namespace CodeSearchTree
                 ret.Add(codeNode);
                 CreateChildren(codeNode, n);
             }
-            foreach (var n in ret)
-                n.CheckName();
+            //First iteration: Read out names.
+            ret.ForEach(x => x.CheckName());
+            //Second iteration: Read out attribute names. No support for parameters.
+            ret.ForEach(x => x.CheckAttributes());
             return ret;
         }
 
@@ -177,14 +196,36 @@ namespace CodeSearchTree
                         Name = (id.RoslynNode as QualifiedNameSyntax).ToString();
                 }
                 else if (n is AttributeSyntax)
-                {
                     Name = (n as AttributeSyntax)?.Name.ToString() ?? "";
-                }
             }
             if (string.IsNullOrWhiteSpace(Name))
                 Name = "";
             foreach (var child in Children)
                 child.CheckName();
+        }
+
+        private void CheckAttributes()
+        {
+            //Checking for attributes only on classes, methods and properties.
+            if (NodeType == NodeType.ClassDeclarationSyntaxNode || NodeType == NodeType.MethodDeclarationSyntaxNode || NodeType == NodeType.PropertyDeclarationSyntaxNode)
+            {
+                SearchNode[] searchExpression = { new SearchNode(NodeType.AttributeListSyntaxNode), new SearchNode(NodeType.AttributeSyntaxNode) };
+                var att = GetChild(searchExpression);
+                if (!(att == null))
+                {
+                    Attributes.Add(att.Name);
+                    do
+                    {
+                        att = att.GetNextSibling();
+                        if (!(att == null) && att.NodeType == NodeType.AttributeSyntaxNode)
+                            Attributes.Add(att.Name);
+                    } while (!(att == null));
+
+                }
+
+            }
+            foreach (var child in Children)
+                child.CheckAttributes();
         }
 
         private static void CreateChildren(Node node, SyntaxNode roslynNode)
@@ -502,6 +543,18 @@ namespace CodeSearchTree
                 return NodeType.ExplicitInterfaceSpecifierSyntaxNode;
             if (n is CatchDeclarationSyntax)
                 return NodeType.CatchDeclarationSyntaxNode;
+            if (n is ArrowExpressionClauseSyntax)
+                return NodeType.ArrowExpressionClauseSyntaxNode;
+            if (n is ConditionalAccessExpressionSyntax)
+                return NodeType.ConditionalAccessExpressionSyntaxNode;
+            if (n is MemberBindingExpressionSyntax)
+                return NodeType.MemberBindingExpressionSyntaxNode;
+            if (n is InterpolatedStringExpressionSyntax)
+                return NodeType.InterpolatedStringExpressionSyntaxNode;
+            if (n is InterpolationSyntax)
+                return NodeType.InterpolationSyntaxNode;
+            if (n is InterpolatedStringTextSyntax)
+                return NodeType.InterpolatedStringTextSyntaxNode;
 #if DEBUG
             Console.WriteLine(n.GetType().Name);
             var code = n.ToString().Length > 40 ? n.ToString().Substring(0, 40) : n.ToString();
@@ -618,24 +671,26 @@ namespace CodeSearchTree
         {
             if (t.Kind() == SyntaxKind.RegionDirectiveTrivia)
                 return Trivia.TriviaTypes.RegionDirectiveTriviaSyntaxType;
-            else if (t.Kind() == SyntaxKind.SingleLineCommentTrivia)
+            if (t.Kind() == SyntaxKind.SingleLineCommentTrivia)
                 return Trivia.TriviaTypes.SingleLineCommentTriviaType;
-            else if (t.Kind() == SyntaxKind.EndRegionDirectiveTrivia)
+            if (t.Kind() == SyntaxKind.EndRegionDirectiveTrivia)
                 return Trivia.TriviaTypes.EndRegionDirectiveTriviaType;
-            else if (t.Kind() == SyntaxKind.MultiLineCommentTrivia)
+            if (t.Kind() == SyntaxKind.MultiLineCommentTrivia)
                 return Trivia.TriviaTypes.MultiLineCommentTriviaType;
-            else if (t.Kind() == SyntaxKind.SingleLineDocumentationCommentTrivia)
+            if (t.Kind() == SyntaxKind.SingleLineDocumentationCommentTrivia)
                 return Trivia.TriviaTypes.SingleLineDocumentationCommentTriviaType;
-            else if (t.Kind() == SyntaxKind.IfDirectiveTrivia)
+            if (t.Kind() == SyntaxKind.IfDirectiveTrivia)
                 return Trivia.TriviaTypes.IfDirectiveTriviaType;
-            else if (t.Kind() == SyntaxKind.DisabledTextTrivia)
+            if (t.Kind() == SyntaxKind.DisabledTextTrivia)
                 return Trivia.TriviaTypes.DisabledTextTriviaType;
-            else if (t.Kind() == SyntaxKind.ElseDirectiveTrivia)
+            if (t.Kind() == SyntaxKind.ElseDirectiveTrivia)
                 return Trivia.TriviaTypes.ElseDirectiveTriviaType;
-            else if (t.Kind() == SyntaxKind.PragmaChecksumDirectiveTrivia)
+            if (t.Kind() == SyntaxKind.PragmaChecksumDirectiveTrivia)
                 return Trivia.TriviaTypes.PragmaChecksumDirectiveTriviaType;
-            else if (t.Kind() == SyntaxKind.LineDirectiveTrivia)
+            if (t.Kind() == SyntaxKind.LineDirectiveTrivia)
                 return Trivia.TriviaTypes.LineDirectiveTriviaType;
+            if (t.Kind() == SyntaxKind.EndIfDirectiveTrivia)
+                return Trivia.TriviaTypes.EndIfDirectiveTriviaType;
             else
             {
 #if DEBUG
