@@ -99,6 +99,7 @@
         MemberBindingExpressionSyntaxNode,
         InterpolatedStringExpressionSyntaxNode,
         InterpolationSyntaxNode,
-        InterpolatedStringTextSyntaxNode
+        InterpolatedStringTextSyntaxNode,
+        GotoStatementSyntaxNode
     }
 }

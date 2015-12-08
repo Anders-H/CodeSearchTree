@@ -336,6 +336,8 @@ namespace CodeSearchTree
                 case "interpolatedtext":
                 case "interpolated_text":
                     return NodeType.InterpolatedStringTextSyntaxNode;
+                case "goto":
+                    return NodeType.GotoStatementSyntaxNode;
                 default:
                     return NodeType.UnknownNode;
             }
@@ -537,6 +539,8 @@ namespace CodeSearchTree
                     return "interpolation";
                 case NodeType.InterpolatedStringTextSyntaxNode:
                     return "interpolatedtext";
+                case NodeType.GotoStatementSyntaxNode:
+                    return "goto";
                 default:
                     throw new Exception("Jag fattar inget.");
             }

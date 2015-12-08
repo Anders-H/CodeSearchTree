@@ -578,6 +578,8 @@ namespace CodeSearchTree
                 return NodeType.InterpolationSyntaxNode;
             if (n is InterpolatedStringTextSyntax)
                 return NodeType.InterpolatedStringTextSyntaxNode;
+            if (n is GotoStatementSyntax)
+                return NodeType.GotoStatementSyntaxNode;
 #if DEBUG
             Console.WriteLine(n.GetType().Name);
             var code = n.ToString().Length > 40 ? n.ToString().Substring(0, 40) : n.ToString();
