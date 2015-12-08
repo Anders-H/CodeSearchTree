@@ -27,6 +27,7 @@
         }
 
         public string AttributeName { get; set; }
+        public string ReturnType { get; set; }
         public NodeType NodeType { get; set; }
         public int Index { get; set; }
         public string Name { get; set; }

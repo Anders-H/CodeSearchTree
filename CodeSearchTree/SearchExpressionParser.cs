@@ -21,6 +21,7 @@ namespace CodeSearchTree
                 const string noIndex = @"^(\*|[a-z]+)$";
                 const string withIndex = @"^(\*|[a-z]+)\[[0-9]+\]$";
                 const string withAttribute = @"^(\*|[a-z]+)\[@.+\]$";
+                const string withReturnType = @"^(\*|[a-z]+)\[#.+\]$";
                 const string withName = @"^(\*|[a-z]+)\[.+\]$";
                 foreach (var part in parts)
                 {
@@ -40,6 +41,13 @@ namespace CodeSearchTree
                         var close = part.IndexOf(']');
                         var attributeName = part.Substring(open + 2, close - (open + 2)).Trim();
                         ret.Add(new SearchNode(KeywordToEnum(part.Substring(0, open))) { AttributeName = attributeName });
+                    }
+                    else if (Regex.IsMatch(part, withReturnType))
+                    {
+                        var open = part.IndexOf('[');
+                        var close = part.IndexOf(']');
+                        var returnType = part.Substring(open + 2, close - (open + 2)).Trim();
+                        ret.Add(new SearchNode(KeywordToEnum(part.Substring(0, open))) { ReturnType = returnType });
                     }
                     else if (Regex.IsMatch(part, withName))
                     {

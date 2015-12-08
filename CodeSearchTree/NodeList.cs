@@ -23,7 +23,7 @@ namespace CodeSearchTree
         }
 
         /// <summary>
-        ///     Returns all direct children with given name.
+        ///     Returns all direct children of given type with given name.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="name"></param>
@@ -33,6 +33,34 @@ namespace CodeSearchTree
             var typeFiltered = FilterByNameOrIndexOrType(type);
             var ret = new NodeList();
             ret.AddRange(typeFiltered.Where(x => string.Compare(x.Name, name, StringComparison.OrdinalIgnoreCase) == 0).ToArray());
+            return ret;
+        }
+
+        /// <summary>
+        ///     Returns all direct children of given type with given attribute.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
+        internal NodeList FilterByTypeAndAttribute(NodeType type, string attribute)
+        {
+            var typeFiltered = FilterByNameOrIndexOrType(type);
+            var ret = new NodeList();
+            ret.AddRange(typeFiltered.Where(x => x.Attributes.Contains(attribute)).ToArray());
+            return ret;
+        }
+
+        /// <summary>
+        ///     Returns all direct children of given type with given return type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="returnType"></param>
+        /// <returns></returns>
+        internal NodeList FilterByTypeAndReturnType(NodeType type, string returnType)
+        {
+            var typeFiltered = FilterByNameOrIndexOrType(type);
+            var ret = new NodeList();
+            ret.AddRange(typeFiltered.Where(x => string.Compare(x.ReturnTypeName, returnType, StringComparison.OrdinalIgnoreCase) == 0).ToArray());
             return ret;
         }
 
@@ -55,12 +83,16 @@ namespace CodeSearchTree
         /// <param name="index"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal NodeList FilterByTypeAndNameOrIndex(int index, string name, NodeType type)
+        internal NodeList FilterByTypeAndNameOrIndex(int index, string name, string attribute, string returnType, NodeType type)
         {
             if (index >= 0)
                 return FilterByTypeAndNameOrIndex(type, index);
             if (!string.IsNullOrEmpty(name))
                 return FilterByTypeAndNameOrIndex(type, name);
+            if (!string.IsNullOrEmpty(attribute))
+                return FilterByTypeAndAttribute(type, attribute);
+            if (!string.IsNullOrEmpty(returnType))
+                return FilterByTypeAndReturnType(type, returnType);
             if (type != NodeType.UnknownNode)
                 return FilterByNameOrIndexOrType(type);
             throw new Exception("Must provide name (!= \"\") or index (>= 0) or given node type.");
@@ -72,7 +104,7 @@ namespace CodeSearchTree
         /// <param name="sn"></param>
         /// <returns></returns>
         internal NodeList FilterByTypeAndNameOrIndex(SearchNode sn) =>
-            FilterByTypeAndNameOrIndex(sn.Index, sn.Name, sn.NodeType);
+            FilterByTypeAndNameOrIndex(sn.Index, sn.Name, sn.AttributeName, sn.ReturnType, sn.NodeType);
 
         public NodeList GetNodes(Func<Node, bool> predicate)
         {
