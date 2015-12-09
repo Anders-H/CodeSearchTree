@@ -100,6 +100,9 @@
         InterpolatedStringExpressionSyntaxNode,
         InterpolationSyntaxNode,
         InterpolatedStringTextSyntaxNode,
-        GotoStatementSyntaxNode
+        GotoStatementSyntaxNode,
+        LockStatementSyntaxNode,
+        ArrayCreationExpressionSyntaxNode,
+        FinallyClauseSyntaxNode
     }
 }

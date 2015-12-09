@@ -338,6 +338,12 @@ namespace CodeSearchTree
                     return NodeType.InterpolatedStringTextSyntaxNode;
                 case "goto":
                     return NodeType.GotoStatementSyntaxNode;
+                case "lock":
+                    return NodeType.LockStatementSyntaxNode;
+                case "array":
+                    return NodeType.ArrayCreationExpressionSyntaxNode;
+                case "finally":
+                    return NodeType.FinallyClauseSyntaxNode;
                 default:
                     return NodeType.UnknownNode;
             }
@@ -541,6 +547,12 @@ namespace CodeSearchTree
                     return "interpolatedtext";
                 case NodeType.GotoStatementSyntaxNode:
                     return "goto";
+                case NodeType.LockStatementSyntaxNode:
+                    return "lock";
+                case NodeType.ArrayCreationExpressionSyntaxNode:
+                    return "array";
+                case NodeType.FinallyClauseSyntaxNode:
+                    return "finally";
                 default:
                     throw new Exception("Jag fattar inget.");
             }

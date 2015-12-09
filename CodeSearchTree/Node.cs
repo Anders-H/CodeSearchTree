@@ -580,6 +580,12 @@ namespace CodeSearchTree
                 return NodeType.InterpolatedStringTextSyntaxNode;
             if (n is GotoStatementSyntax)
                 return NodeType.GotoStatementSyntaxNode;
+            if (n is LockStatementSyntax)
+                return NodeType.LockStatementSyntaxNode;
+            if (n is ArrayCreationExpressionSyntax)
+                return NodeType.ArrayCreationExpressionSyntaxNode;
+            if (n is FinallyClauseSyntax)
+                return NodeType.FinallyClauseSyntaxNode;
 #if DEBUG
             Console.WriteLine(n.GetType().Name);
             var code = n.ToString().Length > 40 ? n.ToString().Substring(0, 40) : n.ToString();
