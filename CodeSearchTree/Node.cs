@@ -72,6 +72,9 @@ namespace CodeSearchTree
         [Category("Relatives"), Description("Type of parant node, if available.")]
         public NodeType ParentType => Parent?.NodeType ?? NodeType.UnknownNode;
 
+        [Category("Meta"), Description("String representation of node type.")]
+        public string NodeTypeString => SearchExpressionParser.NodeTypeToKeyword(this.NodeType);
+
         [Category("Meta"), Description("Strign representing list of attributes.")]
         public string AttributesString
         {
@@ -172,12 +175,19 @@ namespace CodeSearchTree
             if (n != null)
             {
                 if (n is ClassDeclarationSyntax)
-                    Name = (n as ClassDeclarationSyntax).Identifier.ToString();
+                    Name = (n as ClassDeclarationSyntax)?.Identifier.ToString();
                 else if (n is NamespaceDeclarationSyntax)
-                    Name = (n as NamespaceDeclarationSyntax).Name.ToString();
+                    Name = (n as NamespaceDeclarationSyntax)?.Name.ToString();
                 else if (n is FieldDeclarationSyntax)
                 {
-                    //TODO: Extract field name.
+                    var field = (n as FieldDeclarationSyntax);
+                    var v = field.ChildNodes().Where(x => x is VariableDeclarationSyntax).FirstOrDefault();
+                    if (!(v == null))
+                    {
+                        var vd = v.ChildNodes().Where(x => x is VariableDeclaratorSyntax).FirstOrDefault();
+                        if (!(vd == null))
+                            Name = (vd as VariableDeclaratorSyntax)?.Identifier.ToString();
+                    }
                 }
                 else if (n is PropertyDeclarationSyntax)
                     Name = (n as PropertyDeclarationSyntax)?.Identifier.ToString() ?? "";
@@ -185,7 +195,7 @@ namespace CodeSearchTree
                 {
                     var vars = (n as VariableDeclarationSyntax).Variables;
                     if (vars.Count > 0)
-                        Name = vars.First().Identifier.ToString();
+                        Name = vars.First()?.Identifier.ToString() ?? "";
                 }
                 else if (n is IdentifierNameSyntax)
                     Name = n.ToString();
@@ -200,10 +210,14 @@ namespace CodeSearchTree
                         Name = (id?.RoslynNode as IdentifierNameSyntax)?.ToString() ?? "";
                     }
                     else
-                        Name = (id.RoslynNode as QualifiedNameSyntax).ToString();
+                        Name = (id.RoslynNode as QualifiedNameSyntax)?.ToString();
                 }
                 else if (n is AttributeSyntax)
                     Name = (n as AttributeSyntax)?.Name.ToString() ?? "";
+                else if (n is ConstructorDeclarationSyntax)
+                    Name = (n as ConstructorDeclarationSyntax)?.Identifier.ToString() ?? "";
+                else if (n is ParameterSyntax)
+                    Name = (n as ParameterSyntax)?.Identifier.ToString() ?? "";
             }
             if (string.IsNullOrWhiteSpace(Name))
                 Name = "";
