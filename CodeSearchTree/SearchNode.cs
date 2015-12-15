@@ -2,34 +2,34 @@
 {
     public class SearchNode
     {
-        public SearchNode(NodeType nodeType)
-        {
-            NodeType = nodeType;
-            Index = -1;
-            Name = "";
-            AttributeName = "";
-        }
-
-        public SearchNode(NodeType nodeType, int index)
+        private SearchNode(NodeType nodeType, int index, string name, string returnType, string AttributeName)
         {
             NodeType = nodeType;
             Index = index;
-            Name = "";
-            AttributeName = "";
-        }
-
-        public SearchNode(NodeType nodeType, string name)
-        {
-            NodeType = nodeType;
-            Index = -1;
             Name = name;
+            ReturnType = returnType;
             AttributeName = "";
         }
 
-        public string AttributeName { get; set; }
-        public string ReturnType { get; set; }
-        public NodeType NodeType { get; set; }
-        public int Index { get; set; }
-        public string Name { get; set; }
+        public static SearchNode CreateSearchByType(NodeType nodeType)
+            => new SearchNode(nodeType, -1, "", "", "");
+
+        public static SearchNode CreateSearchByTypeAndIndex(NodeType nodeType, int index)
+            => new SearchNode(nodeType, index, "", "", "");
+
+        public static SearchNode CerateSearchByTypeAndAttribute(NodeType nodeType, string attributeName)
+            => new SearchNode(nodeType, -1, "", "", attributeName);
+
+        public static SearchNode CerateSearchByTypeAndReturnType(NodeType nodeType, string returnType)
+            => new SearchNode(nodeType, -1, "", returnType, "");
+
+        public static SearchNode CerateSearchByTypeAndName(NodeType nodeType, string name)
+            => new SearchNode(nodeType, -1, name, "", "");
+
+        public string AttributeName { get; private set; }
+        public string ReturnType { get; private set; }
+        public NodeType NodeType { get; private set; }
+        public int Index { get; private set; }
+        public string Name { get; private set; }
     }
 }

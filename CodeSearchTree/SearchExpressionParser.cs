@@ -26,35 +26,35 @@ namespace CodeSearchTree
                 foreach (var part in parts)
                 {
                     if (Regex.IsMatch(part, noIndex))
-                        ret.Add(new SearchNode(KeywordToEnum(part)));
+                        ret.Add(SearchNode.CreateSearchByType(KeywordToEnum(part)));
                     else if (Regex.IsMatch(part, withIndex))
                     {
                         var open = part.IndexOf('[');
                         var close = part.IndexOf(']');
                         var indexString = part.Substring(open + 1, close - (open + 1)).Trim();
                         var index = int.Parse(indexString);
-                        ret.Add(new SearchNode(KeywordToEnum(part.Substring(0, open)), index));
+                        ret.Add(SearchNode.CreateSearchByTypeAndIndex(KeywordToEnum(part.Substring(0, open)), index));
                     }
                     else if (Regex.IsMatch(part, withAttribute))
                     {
                         var open = part.IndexOf('[');
                         var close = part.IndexOf(']');
                         var attributeName = part.Substring(open + 2, close - (open + 2)).Trim();
-                        ret.Add(new SearchNode(KeywordToEnum(part.Substring(0, open))) { AttributeName = attributeName });
+                        ret.Add(SearchNode.CerateSearchByTypeAndAttribute(KeywordToEnum(part.Substring(0, open)), attributeName));
                     }
                     else if (Regex.IsMatch(part, withReturnType))
                     {
                         var open = part.IndexOf('[');
                         var close = part.IndexOf(']');
                         var returnType = part.Substring(open + 2, close - (open + 2)).Trim();
-                        ret.Add(new SearchNode(KeywordToEnum(part.Substring(0, open))) { ReturnType = returnType });
+                        ret.Add(SearchNode.CerateSearchByTypeAndReturnType(KeywordToEnum(part.Substring(0, open)), returnType));
                     }
                     else if (Regex.IsMatch(part, withName))
                     {
                         var open = part.IndexOf('[');
                         var close = part.IndexOf(']');
                         var name = part.Substring(open + 1, close - (open + 1)).Trim();
-                        ret.Add(new SearchNode(KeywordToEnum(part.Substring(0, open)), name));
+                        ret.Add(SearchNode.CerateSearchByTypeAndName(KeywordToEnum(part.Substring(0, open)), name));
                     }
                     else
                         throw new Exception("Query expression contains errors.");

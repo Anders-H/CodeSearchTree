@@ -169,6 +169,48 @@ namespace CodeSearchTree
             return ret;
         }
 
+        /// <summary>
+        ///     Checks if this node confirms to a search node.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public bool IsMatch(SearchNode n)
+        {
+            if (n.NodeType == this.NodeType || n.NodeType == NodeType.Any)
+            {
+                if (n.Index >= 0 && this.TypeFilteredIndex == n.Index)
+                    return true;
+                if (!(string.IsNullOrEmpty(n.AttributeName)) && this.Attributes.Contains(n.AttributeName))
+                    return true;
+                if (!(string.IsNullOrEmpty(n.Name)) && string.Compare(this.Name, n.Name) == 0)
+                    return true;
+                if (!(string.IsNullOrEmpty(n.Name)) && string.Compare(this.ReturnTypeName, n.ReturnType) == 0)
+                    return true;
+                if (n.Index < 0 && string.IsNullOrEmpty(n.AttributeName) && string.IsNullOrEmpty(n.Name) && string.IsNullOrEmpty(n.ReturnType))
+                    return true;
+            }
+            return false;
+        }
+
+        public int TypeFilteredIndex
+        {
+            get
+            {
+                var parent = Parent == null ? ParentListIfNoParent : Parent.Children;
+                var subset = parent.Filter(SearchNode.CreateSearchByType(this.NodeType));
+                return subset.IndexOf(this);
+            }
+        }
+        
+        public int ActualIndex
+        {
+            get
+            {
+                var parent = Parent == null ? ParentListIfNoParent : Parent.Children;
+                return parent.IndexOf(this);
+            }
+        }
+
         private void CheckName()
         {
             var n = RoslynNode as SyntaxNode;
@@ -246,7 +288,10 @@ namespace CodeSearchTree
             //Checking for attributes only on classes, methods and properties.
             if (NodeType == NodeType.ClassDeclarationSyntaxNode || NodeType == NodeType.MethodDeclarationSyntaxNode || NodeType == NodeType.PropertyDeclarationSyntaxNode)
             {
-                SearchNode[] searchExpression = { new SearchNode(NodeType.AttributeListSyntaxNode), new SearchNode(NodeType.AttributeSyntaxNode) };
+                SearchNode[] searchExpression = {
+                    SearchNode.CreateSearchByType(NodeType.AttributeListSyntaxNode),
+                    SearchNode.CreateSearchByType(NodeType.AttributeSyntaxNode)
+                };
                 var att = GetChild(searchExpression);
                 if (!(att == null))
                 {
@@ -301,22 +346,17 @@ namespace CodeSearchTree
                         else
                         {
                             //Filtrera ut så att vi har rätt typ, därefter ta reda på index.
-                            var index =
-                                currentThis.ParentListIfNoParent.Where(x => x.NodeType == currentThis.NodeType)
-                                    .ToList()
-                                    .IndexOf(currentThis);
+                            var index = currentThis.TypeFilteredIndex;
                             //Om index är > 0, presentera det som en [vakt].
-                            ret = index <= 0
+                            ret = currentThis.TypeFilteredIndex <= 0
                                 ? $"{SearchExpressionParser.NodeTypeToKeyword(currentThis.NodeType)}{(ret == "" ? "" : "/")}{ret}"
                                 : $"{SearchExpressionParser.NodeTypeToKeyword(currentThis.NodeType)}[{index}]{(ret == "" ? "" : "/")}{ret}";
                         }
                     }
                     else
                     {
-                        var index =
-                            currentParent.Children.Where(x => x.NodeType == currentThis.NodeType)
-                                .ToList()
-                                .IndexOf(currentThis);
+                        //Filtrera ut så att vi har rätt typ, därefter ta reda på index.
+                        var index = currentThis.TypeFilteredIndex;
                         //Om index är > 0, presentera det som en [vakt].
                         ret = index <= 0
                             ? $"{SearchExpressionParser.NodeTypeToKeyword(currentThis.NodeType)}{(ret == "" ? "" : "/")}{ret}"
@@ -356,10 +396,7 @@ namespace CodeSearchTree
                             else
                             {
                                 //Filtrera ut så att vi har rätt typ, därefter ta reda på index.
-                                var index =
-                                    currentThis.ParentListIfNoParent.Where(x => x.NodeType == currentThis.NodeType)
-                                        .ToList()
-                                        .IndexOf(currentThis);
+                                var index = currentThis.TypeFilteredIndex;
                                 //Om index är > 0, presentera det som en [vakt].
                                 ret = index <= 0
                                     ? $"{SearchExpressionParser.NodeTypeToKeyword(currentThis.NodeType)}{(ret == "" ? "" : "/")}{ret}"
@@ -376,10 +413,8 @@ namespace CodeSearchTree
                     {
                         if (currentThis.Name == "")
                         {
-                            var index =
-                                currentParent.Children.Where(x => x.NodeType == currentThis.NodeType)
-                                    .ToList()
-                                    .IndexOf(currentThis);
+                            //Filtrera ut så att vi har rätt typ, därefter ta reda på index.
+                            var index = currentThis.TypeFilteredIndex;
                             //Om index är > 0, presentera det som en [vakt].
                             ret = index <= 0
                                 ? $"{SearchExpressionParser.NodeTypeToKeyword(currentThis.NodeType)}{(ret == "" ? "" : "/")}{ret}"
@@ -626,59 +661,61 @@ namespace CodeSearchTree
             }
         }
 
-        public NodeList GetChildren(params NodeType[] type)
+        public NodeList GetChildren(NodeType[] type)
         {
             if (type.Length <= 0)
                 return new NodeList();
             if (type.Length == 1)
-                return Children.FilterByNameOrIndexOrType(type[0]);
+                return Children.Filter(SearchNode.CreateSearchByType(type[0]));
             if (type.Length == 2)
             {
                 var ret = new NodeList();
-                var item = Children.FilterByNameOrIndexOrType(type[0]).FirstOrDefault();
+                var item = Children.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
                 if (item == null)
                     return ret;
-                ret.AddRange(item.Children.FilterByNameOrIndexOrType(type[1]));
+                ret.AddRange(item.Children.Filter(SearchNode.CreateSearchByType(type[1])));
                 return ret;
             }
             else
             {
-                var item = Children.FilterByNameOrIndexOrType(type[0]).FirstOrDefault();
+                var item = Children.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
                 for (int i = 1; i < type.Length - 1; i++)
                 {
                     if (item == null)
                         return new NodeList();
-                    item = item.Children.FilterByNameOrIndexOrType(type[i]).FirstOrDefault();
+                    item = item.Children.Filter(SearchNode.CreateSearchByType(type[i])).FirstOrDefault();
                 }
                 if (item == null)
                     return new NodeList();
-                return item.Children.FilterByNameOrIndexOrType(type[type.Length - 1]);
+                return item.Children.Filter(SearchNode.CreateSearchByType(type[type.Length - 1]));
             }
         }
 
         public Node GetChild(params NodeType[] type) => GetChildren(type).FirstOrDefault();
+
+        public Node GetChild(string searchExpression) => GetChild(new SearchExpressionParser(searchExpression).Parse().ToArray());
 
         public Node GetChild(params SearchNode[] sn)
         {
             if (sn.Length == 0)
                 return null;
             if (sn.Length == 1)
-                return Children.FilterByTypeAndNameOrIndex(sn[0]).FirstOrDefault();
+                return Children.Filter(sn[0]).FirstOrDefault();
             if (sn.Length == 2)
             {
-                var item = Children.FilterByTypeAndNameOrIndex(sn[0]).FirstOrDefault();
-                return item?.Children.FilterByTypeAndNameOrIndex(sn[1]).FirstOrDefault();
+                var item = Children.Filter(sn[0]).FirstOrDefault();
+                return item?.Children.Filter(sn[1]).FirstOrDefault();
             }
             else
             {
-                var item = Children.FilterByTypeAndNameOrIndex(sn[0]).FirstOrDefault();
+                var item = Children.Filter(sn[0]).FirstOrDefault();
                 for (int i = 1; i < (sn.Length - 1); i++)
                 {
                     if (item == null)
                         return null;
-                    item = item.Children.FilterByTypeAndNameOrIndex(sn[i]).FirstOrDefault();
+                    item = item.Children.Filter(sn[i]).FirstOrDefault();
                 }
-                return item?.Children.FilterByTypeAndNameOrIndex(sn[sn.Length - 1]).FirstOrDefault();
+                return item?.Children.Filter(sn[sn.Length - 1]).FirstOrDefault();
             }
         }
 
@@ -702,9 +739,6 @@ namespace CodeSearchTree
 
         public static SearchNodeList ParseSearchExpression(string searchExpression) =>
             new SearchExpressionParser(searchExpression).Parse();
-
-        public Node GetChild(string searchExpression) =>
-            GetChild(new SearchExpressionParser(searchExpression).Parse().ToArray());
 
         public Node GetNextSibling() =>
             Parent?.Children.GetNextSibling(this);
