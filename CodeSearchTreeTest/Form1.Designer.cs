@@ -39,7 +39,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.propertyGrid1 = new System.Windows.Forms.PropertyGrid();
             this.label4 = new System.Windows.Forms.Label();
-            this.txtInput = new System.Windows.Forms.TextBox();
+            this.txtInput = new CodeSearchTreeTest.TextInput();
             this.label1 = new System.Windows.Forms.Label();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
@@ -196,6 +196,7 @@
             // 
             // txtInput
             // 
+            this.txtInput.AcceptsReturn = true;
             this.txtInput.BackColor = System.Drawing.SystemColors.Control;
             this.txtInput.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtInput.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -206,7 +207,7 @@
             this.txtInput.Size = new System.Drawing.Size(1416, 135);
             this.txtInput.TabIndex = 0;
             this.txtInput.WordWrap = false;
-            this.txtInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtInput_KeyDown);
+            this.txtInput.Entered += new System.Action<object, CodeSearchTreeTest.TextEnteredEventArgs>(this.txtInput_Entered);
             // 
             // label1
             // 
@@ -354,7 +355,7 @@
       private System.Windows.Forms.TreeView treeView1;
       private System.Windows.Forms.TextBox txtResult;
       private System.Windows.Forms.SplitContainer splitContainer1;
-      private System.Windows.Forms.TextBox txtInput;
+      private TextInput txtInput;
       private System.Windows.Forms.Label label1;
       private System.Windows.Forms.SplitContainer splitContainer2;
       private System.Windows.Forms.Label label2;

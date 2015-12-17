@@ -63,6 +63,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextInput.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="FindFileDialog.resx">
       <DependentUpon>FindFileDialog.cs</DependentUpon>
     </EmbeddedResource>

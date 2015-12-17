@@ -87,13 +87,13 @@ namespace CodeSearchTreeTest
          }
          if (n == null)
          {
-            this.Respond("No document loaded.");
+            txtInput.WriteLine("No document loaded.");
             return;
          }
          var node = n.Tag as CodeSearchTree.Node;
          if (node == null)
          {
-            this.Respond("No document loaded.");
+            txtInput.WriteLine("No document loaded.");
             return;
          }
 #if !DEBUG
@@ -109,13 +109,13 @@ namespace CodeSearchTreeTest
             if (svar == null)
             {
                txtResult.AppendText("Nothing.");
-               this.Respond("Nothing.");
+               txtInput.WriteLine("Nothing.");
                return;
             }
             var one_line_result = System.Text.RegularExpressions.Regex.Replace(svar.Source, @"\s+", " ").Trim();
             if (one_line_result.Length > 20)
-               one_line_result = string.Format("{0}...", one_line_result.Substring(0, 20).Trim());
-            this.Respond(string.Format("{0} ({1} characters)", one_line_result, svar.Source.Length));
+               one_line_result = ($"{one_line_result.Substring(0, 20).Trim()}...");
+            txtInput.WriteLine($"{one_line_result} ({svar.Source.Length} characters)");
             txtResult.AppendText(svar.Source);
             txtResult.AppendText("\n");
             if (svar.LeadingTrivia.Count > 0)
@@ -136,8 +136,8 @@ namespace CodeSearchTreeTest
          {
             var s = new StringBuilder();
             s.AppendLine("EXCEPTION:");
-            s.AppendLine(string.Format("Type: {0}", ex.GetType().Name));
-            s.AppendLine(string.Format("Message: {0}", ex.Message));
+            s.AppendLine($"Type: {ex.GetType().Name}");
+            s.AppendLine($"Message: {ex.Message}");
             s.AppendLine();
             s.AppendLine(ex.ToString());
             txtResult.Text = s.ToString();
@@ -145,32 +145,6 @@ namespace CodeSearchTreeTest
             txtResult.ScrollToCaret();
          }
 #endif
-      }
-
-      private void Respond(string txt)
-      {
-         if (!(txtInput.Text.EndsWith("\n")))
-            txtInput.AppendText("\n");
-         txtInput.AppendText(txt);
-         txtInput.SelectionStart = txtInput.Text.Length;
-      }
-
-      private void txtInput_KeyDown(object sender, KeyEventArgs e)
-      {
-         if (e.KeyCode == Keys.Enter && !(e.Shift))
-         {
-            var end = txtInput.SelectionStart;
-            var line = txtInput.GetLineFromCharIndex(end);
-            var start = txtInput.GetFirstCharIndexFromLine(line);
-            e.Handled = true;
-            var entered = txtInput.Text.Substring(start, end - start).Trim();
-            txtInput.SelectionStart = txtInput.Text.Length;
-            if (!(entered == ""))
-            {
-               this.Respond(string.Format("Search for \"{0}\".", entered));
-               this.DoSearch(entered);
-            }
-         }
       }
 
       private void treeView1_DragEnter(object sender, DragEventArgs e)
@@ -203,12 +177,12 @@ namespace CodeSearchTreeTest
             this.code_tree = null;
             var s = new StringBuilder();
             s.AppendLine("EXCEPTION:");
-            s.AppendLine(string.Format("Type: {0}", ex.GetType().Name));
-            s.AppendLine(string.Format("Message: {0}", ex.Message));
-            s.AppendLine();
+                s.AppendLine($"Type: {ex.GetType().Name}");
+                s.AppendLine($"Message: {ex.Message}");
+                s.AppendLine();
             s.AppendLine(ex.ToString());
             txtResult.Text = s.ToString();
-            MessageBox.Show(string.Format("Failed to load \"{0}\".", data[0]), "Open file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to load \"{data[0]}\".", "Open file", MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
 #endif
 
@@ -304,5 +278,11 @@ Search for file that contains node a class named MyClass:
                this.LoadCs(x.SelectedFilename);
          }
       }
-   }
+
+        private void txtInput_Entered(object arg1, TextEnteredEventArgs arg2)
+        {
+            txtInput.WriteLine($"Search for \"{arg2.Entered}\".");
+            this.DoSearch(arg2.Entered);
+        }
+    }
 }
