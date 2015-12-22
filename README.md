@@ -3,6 +3,12 @@ Simple Roslyn based code analysis library.
 
 CodeSearchTree.dll uses Roslyn but does not require that your program references Roslyn.
 
+##Install version 1.0.1 from NuGet:
+
+`Install-Package CodeSearchTree`
+
+Download test client: [http://winsoft.se/files/CodeSearchTreeClient.zip](http://winsoft.se/files/CodeSearchTreeClient.zip)
+
 ## Search expressions
 
 A search expression is a slash separated list of nodes. To get from a namespace to a method via a class, type:
