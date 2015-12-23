@@ -80,3 +80,7 @@ Given that `my_class` references to a class, find property or method in a class 
 ```C#
 var x = my_class.GetChild("*[#int]");
 ```
+
+##Use cases
+
+- [Read name and values from constants](http://www.winsoft.se/2015/12/codesearchtree-use-case-read-constant-values/)
