@@ -46,6 +46,8 @@ namespace CodeSearchTree
         [Category("Meta"), Description("List of attributes.")]
         public List<string> Attributes { get; private set; } = new List<string>();
 
+        public string Operator { get; private set; } = "";
+        public OperatorType OperatorType { get; private set; } = OperatorType.None;
         public object RoslynNode { get; }
 
         protected internal Node(object roslynNode, string source)
@@ -263,6 +265,29 @@ namespace CodeSearchTree
             }
             if (string.IsNullOrWhiteSpace(Name))
                 Name = "";
+
+            //Check for operator.
+            var binaryExpression = RoslynNode as BinaryExpressionSyntax;
+            if (!(binaryExpression == null) && !(binaryExpression.OperatorToken == null))
+            {
+                Operator = binaryExpression.OperatorToken.Text;
+                OperatorType = OperatorType.Binary;
+            }
+            var unaryPostfixExpression = RoslynNode as PostfixUnaryExpressionSyntax;
+            if (!(unaryPostfixExpression == null) && !(unaryPostfixExpression.OperatorToken == null))
+            {
+                Operator = unaryPostfixExpression.OperatorToken.Text;
+                OperatorType = OperatorType.UnaryPostfix;
+            }
+            var unaryPrefixExpression = RoslynNode as PrefixUnaryExpressionSyntax;
+            if (!(unaryPrefixExpression == null) && !(unaryPrefixExpression.OperatorToken == null))
+            {
+                Operator = unaryPrefixExpression.OperatorToken.Text;
+                OperatorType = OperatorType.UnaryPrefix;
+            }
+            //End check for operator.
+
+
             foreach (var child in Children)
                 child.CheckName();
         }

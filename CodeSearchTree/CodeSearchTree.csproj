@@ -101,6 +101,7 @@
     <Compile Include="Node.cs" />
     <Compile Include="NodeList.cs" />
     <Compile Include="NodeType.cs" />
+    <Compile Include="OperatorType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="SearchExpressionParser.cs" />
