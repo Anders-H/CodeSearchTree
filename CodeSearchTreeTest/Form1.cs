@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows.Forms;
 using CodeSearchTree;
 
@@ -167,7 +168,7 @@ namespace CodeSearchTreeTest
          }
          catch (Exception ex)
          {
-            this.code_tree = null;
+            _codeTree = null;
             var s = new StringBuilder();
             s.AppendLine("EXCEPTION:");
                 s.AppendLine($"Type: {ex.GetType().Name}");
