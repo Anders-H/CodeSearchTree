@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace CodeSearchTree
 {
@@ -44,7 +45,7 @@ namespace CodeSearchTree
         internal NodeList ParentListIfNoParent { get; set; }
 
         [Category("Meta"), Description("List of attributes.")]
-        public List<string> Attributes { get; private set; } = new List<string>();
+        public List<string> Attributes { get; } = new List<string>();
 
         public string Operator { get; private set; } = "";
         public OperatorType OperatorType { get; private set; } = OperatorType.None;
@@ -55,18 +56,19 @@ namespace CodeSearchTree
         {
         }
 
-        protected internal Node(object roslynNode, string source, Node parent, NodeType node_type)
+        protected internal Node(object roslynNode, string source, Node parent, NodeType nodeType)
         {
             RoslynNode = roslynNode;
-            StartPosition = (roslynNode as SyntaxNode).FullSpan.Start;
-            EndPosition = (roslynNode as SyntaxNode).FullSpan.End;
-            NodeType = node_type;
+            Debug.Assert(roslynNode != null, "roslynNode != null");
+            StartPosition = ((SyntaxNode) roslynNode).FullSpan.Start;
+            EndPosition = ((SyntaxNode) roslynNode).FullSpan.End;
+            NodeType = nodeType;
             Parent = parent;
             Source = source;
         }
 
         [Category("Main"), Description("Original source length in characters.")]
-        public int Length => this.Source.Length;
+        public int Length => Source.Length;
 
         [Category("Relatives"), Description("Number of child nodes.")]
         public int ChildCount => Children.Count;
@@ -75,7 +77,7 @@ namespace CodeSearchTree
         public NodeType ParentType => Parent?.NodeType ?? NodeType.UnknownNode;
 
         [Category("Meta"), Description("String representation of node type.")]
-        public string NodeTypeString => SearchExpressionParser.NodeTypeToKeyword(this.NodeType);
+        public string NodeTypeString => SearchExpressionParser.NodeTypeToKeyword(NodeType);
 
         [Category("Meta"), Description("Strign representing list of attributes.")]
         public string AttributesString
@@ -110,7 +112,7 @@ namespace CodeSearchTree
             get
             {
                 var s = new StringBuilder();
-                this.TrailingTrivia.ForEach(x => s.Append(x.Source));
+                TrailingTrivia.ForEach(x => s.Append(x.Source));
                 return s.ToString();
             }
         }
@@ -121,12 +123,11 @@ namespace CodeSearchTree
             get
             {
                 var ret = new List<Property>();
-                var n = this.RoslynNode as SyntaxNode;
-                if (n != null)
-                {
-                    var properties = n.GetType().GetProperties();
-                    properties.ToList().ForEach(x => ret.Add(new Property(x.Name, x.GetValue(n))));
-                }
+                var n = RoslynNode as SyntaxNode;
+                if (n == null)
+                    return null;
+                var properties = n.GetType().GetProperties();
+                properties.ToList().ForEach(x => ret.Add(new Property(x.Name, x.GetValue(n))));
                 return ret;
             }
         }
@@ -145,7 +146,7 @@ namespace CodeSearchTree
 
         public static NodeList CreateTreeFromFile(string filename)
         {
-            var code = "";
+            string code;
             using (var sr = new System.IO.StreamReader(filename, Encoding.UTF8))
                 code = sr.ReadToEnd();
             return CreateTreeFromCode(code);
@@ -178,15 +179,19 @@ namespace CodeSearchTree
         /// <returns></returns>
         public bool IsMatch(SearchNode n)
         {
-            if (n.NodeType == this.NodeType || n.NodeType == NodeType.Any)
+            if (n.NodeType == NodeType || n.NodeType == NodeType.Any)
             {
-                if (n.Index >= 0 && this.TypeFilteredIndex == n.Index)
+                //Check for index.
+                if (n.Index >= 0 && TypeFilteredIndex == n.Index)
                     return true;
-                if (!(string.IsNullOrEmpty(n.AttributeName)) && this.Attributes.Contains(n.AttributeName))
+                if (n.Index >= 0)
+                    return false;
+                //Check for attribute name.
+                if (!(string.IsNullOrEmpty(n.AttributeName)) && Attributes.Contains(n.AttributeName))
                     return true;
-                if (!(string.IsNullOrEmpty(n.Name)) && string.Compare(this.Name, n.Name) == 0)
+                if (!(string.IsNullOrEmpty(n.Name)) && string.CompareOrdinal(Name, n.Name) == 0)
                     return true;
-                if (!(string.IsNullOrEmpty(n.Name)) && string.Compare(this.ReturnTypeName, n.ReturnType) == 0)
+                if (!(string.IsNullOrEmpty(n.ReturnType)) && string.CompareOrdinal(ReturnTypeName, n.ReturnType) == 0)
                     return true;
                 if (n.Index < 0 && string.IsNullOrEmpty(n.AttributeName) && string.IsNullOrEmpty(n.Name) && string.IsNullOrEmpty(n.ReturnType))
                     return true;
@@ -199,7 +204,7 @@ namespace CodeSearchTree
             get
             {
                 var parent = Parent == null ? ParentListIfNoParent : Parent.Children;
-                var subset = parent.Filter(SearchNode.CreateSearchByType(this.NodeType));
+                var subset = parent.Filter(SearchNode.CreateSearchByType(NodeType));
                 return subset.IndexOf(this);
             }
         }
@@ -219,22 +224,19 @@ namespace CodeSearchTree
             if (n != null)
             {
                 if (n is ClassDeclarationSyntax)
-                    Name = (n as ClassDeclarationSyntax)?.Identifier.ToString();
+                    Name = (n as ClassDeclarationSyntax).Identifier.ToString();
                 else if (n is NamespaceDeclarationSyntax)
-                    Name = (n as NamespaceDeclarationSyntax)?.Name.ToString();
+                    Name = (n as NamespaceDeclarationSyntax).Name.ToString();
                 else if (n is FieldDeclarationSyntax)
                 {
                     var field = (n as FieldDeclarationSyntax);
-                    var v = field.ChildNodes().Where(x => x is VariableDeclarationSyntax).FirstOrDefault();
-                    if (!(v == null))
-                    {
-                        var vd = v.ChildNodes().Where(x => x is VariableDeclaratorSyntax).FirstOrDefault();
-                        if (!(vd == null))
-                            Name = (vd as VariableDeclaratorSyntax)?.Identifier.ToString();
-                    }
+                    var v = field.ChildNodes().FirstOrDefault(x => x is VariableDeclarationSyntax);
+                    var vd = v?.ChildNodes().FirstOrDefault(x => x is VariableDeclaratorSyntax);
+                    if (vd != null)
+                        Name = (vd as VariableDeclaratorSyntax)?.Identifier.ToString();
                 }
                 else if (n is PropertyDeclarationSyntax)
-                    Name = (n as PropertyDeclarationSyntax)?.Identifier.ToString() ?? "";
+                    Name = (n as PropertyDeclarationSyntax).Identifier.ToString();
                 else if (n is VariableDeclarationSyntax)
                 {
                     var vars = (n as VariableDeclarationSyntax).Variables;
@@ -257,30 +259,30 @@ namespace CodeSearchTree
                         Name = (id.RoslynNode as QualifiedNameSyntax)?.ToString();
                 }
                 else if (n is AttributeSyntax)
-                    Name = (n as AttributeSyntax)?.Name.ToString() ?? "";
+                    Name = (n as AttributeSyntax).Name.ToString();
                 else if (n is ConstructorDeclarationSyntax)
-                    Name = (n as ConstructorDeclarationSyntax)?.Identifier.ToString() ?? "";
+                    Name = (n as ConstructorDeclarationSyntax).Identifier.ToString();
                 else if (n is ParameterSyntax)
-                    Name = (n as ParameterSyntax)?.Identifier.ToString() ?? "";
+                    Name = (n as ParameterSyntax).Identifier.ToString();
             }
             if (string.IsNullOrWhiteSpace(Name))
                 Name = "";
 
             //Check for operator.
             var binaryExpression = RoslynNode as BinaryExpressionSyntax;
-            if (!(binaryExpression == null) && !(binaryExpression.OperatorToken == null))
+            if (binaryExpression?.OperatorToken != null)
             {
                 Operator = binaryExpression.OperatorToken.Text;
                 OperatorType = OperatorType.Binary;
             }
             var unaryPostfixExpression = RoslynNode as PostfixUnaryExpressionSyntax;
-            if (!(unaryPostfixExpression == null) && !(unaryPostfixExpression.OperatorToken == null))
+            if (unaryPostfixExpression?.OperatorToken != null)
             {
                 Operator = unaryPostfixExpression.OperatorToken.Text;
                 OperatorType = OperatorType.UnaryPostfix;
             }
             var unaryPrefixExpression = RoslynNode as PrefixUnaryExpressionSyntax;
-            if (!(unaryPrefixExpression == null) && !(unaryPrefixExpression.OperatorToken == null))
+            if (unaryPrefixExpression?.OperatorToken != null)
             {
                 Operator = unaryPrefixExpression.OperatorToken.Text;
                 OperatorType = OperatorType.UnaryPrefix;
@@ -298,11 +300,11 @@ namespace CodeSearchTree
             if (n != null)
             {
                 if (n is GenericNameSyntax)
-                    Parent.ReturnTypeName = (n as GenericNameSyntax)?.ToString();
+                    Parent.ReturnTypeName = (n as GenericNameSyntax).ToString();
                 else if (n is PredefinedTypeSyntax)
-                    Parent.ReturnTypeName = (n as PredefinedTypeSyntax)?.ToString();
+                    Parent.ReturnTypeName = (n as PredefinedTypeSyntax).ToString();
                 else if (n is IdentifierNameSyntax)
-                    Parent.ReturnTypeName = (n as IdentifierNameSyntax)?.ToString();
+                    Parent.ReturnTypeName = (n as IdentifierNameSyntax).ToString();
             }
             foreach (var child in Children)
                 child.CheckReturnType();

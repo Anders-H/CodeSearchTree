@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows.Forms;
+using CodeSearchTree;
 
 namespace CodeSearchTreeTest
 {
    public partial class Form1 : Form
    {
-      private CodeSearchTree.NodeList code_tree;
+      private NodeList _codeTree;
 
       public Form1()
       {
@@ -21,15 +18,10 @@ namespace CodeSearchTreeTest
 
       private void Form1_Load(object sender, EventArgs e)
       {
-         cboSearchFrom.Items.Clear();
-         cboSearchFrom.Items.Add("Root");
-         cboSearchFrom.Items.Add("Selected node");
-         cboSearchFrom.Items.Add("Deep (from root)");
+         cboSearchFrom.Items.AddRange(new object[] {"Root", "Selected node", "Deep (from root)"});
          cboSearchFrom.SelectedIndex = 0;
 
-         cboViewSource.Items.Clear();
-         cboViewSource.Items.Add("Context menu");
-         cboViewSource.Items.Add("Node select");
+         cboViewSource.Items.AddRange(new object[] {"Context menu", "Node select"});
          cboViewSource.SelectedIndex = 0;
       }
 
@@ -41,32 +33,32 @@ namespace CodeSearchTreeTest
 
       private void LoadCs(string filename)
       {
-         code_tree = CodeSearchTree.Node.CreateTreeFromFile(filename);
+         _codeTree = Node.CreateTreeFromFile(filename);
          treeView1.BeginUpdate();
          treeView1.Nodes.Clear();
-         foreach (var code_tree_node in code_tree)
+         foreach (var codeTreeNode in _codeTree)
          {
-            var treeview_node = treeView1.Nodes.Add(code_tree_node.ToString());
-            treeview_node.Tag = code_tree_node;
-            this.ConstructChildren(treeview_node, code_tree_node);
+            var treeviewNode = treeView1.Nodes.Add(codeTreeNode.ToString());
+            treeviewNode.Tag = codeTreeNode;
+            ConstructChildren(treeviewNode, codeTreeNode);
          }
          treeView1.EndUpdate(); //Detta är av någon märklig anlednign leading för treeView1.EndUpdate();
 
       }
 
-      private void ConstructChildren(TreeNode parent_treeview, CodeSearchTree.Node parent_code)
+      private void ConstructChildren(TreeNode parentTreeview, Node parentCode)
       {
-         foreach (var code_tree_node in parent_code.Children)
+         foreach (var codeTreeNode in parentCode.Children)
          {
-            var treeview_node = parent_treeview.Nodes.Add(code_tree_node.ToString());
-            treeview_node.Tag = code_tree_node;
-            this.ConstructChildren(treeview_node, code_tree_node);
+            var treeviewNode = parentTreeview.Nodes.Add(codeTreeNode.ToString());
+            treeviewNode.Tag = codeTreeNode;
+            ConstructChildren(treeviewNode, codeTreeNode);
          }
       }
 
       private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
       {
-         propertyGrid1.SelectedObject = e.Node.Tag as CodeSearchTree.Node;
+         propertyGrid1.SelectedObject = e.Node.Tag as Node;
          if (cboViewSource.SelectedIndex == 1)
             viewSourceToolStripMenuItem_Click(sender, new EventArgs());
       }
@@ -74,10 +66,10 @@ namespace CodeSearchTreeTest
       private void DoSearch(string search)
       {
          txtResult.WordWrap = false;
-         var search_from_selected = cboSearchFrom.SelectedIndex == 1 && !(treeView1.SelectedNode == null);
-         var deep_search = cboSearchFrom.SelectedIndex == 2;
+         var searchFromSelected = cboSearchFrom.SelectedIndex == 1 && treeView1.SelectedNode != null;
+         var deepSearch = cboSearchFrom.SelectedIndex == 2;
          TreeNode n = null;
-         if (search_from_selected)
+         if (searchFromSelected)
             n = treeView1.SelectedNode;
          else
          {
@@ -90,7 +82,7 @@ namespace CodeSearchTreeTest
             txtInput.WriteLine("No document loaded.");
             return;
          }
-         var node = n.Tag as CodeSearchTree.Node;
+         var node = n.Tag as Node;
          if (node == null)
          {
             txtInput.WriteLine("No document loaded.");
@@ -100,33 +92,34 @@ namespace CodeSearchTreeTest
          try
          {
 #endif
-            var svar = search_from_selected
+            var resp = searchFromSelected
                      ? node.GetChild(search) //Måste vara korrekt sökväg från val nod.
-                     : deep_search
-                     ? this.code_tree.DeepSearch(search).FirstOrDefault() //Rekrusiv sökning från rooten.
-                     : this.code_tree.GetChild(search); //Korrekt sökväg från rooten.
-            txtResult.Text = "RESULT:\n";
-            if (svar == null)
+                     : deepSearch
+                     ? _codeTree.DeepSearch(search).FirstOrDefault() //Rekrusiv sökning från rooten.
+                     : _codeTree.GetChild(search); //Korrekt sökväg från rooten.
+            txtResult.Text = @"RESULT:
+";
+            if (resp == null)
             {
                txtResult.AppendText("Nothing.");
                txtInput.WriteLine("Nothing.");
                return;
             }
-            var one_line_result = System.Text.RegularExpressions.Regex.Replace(svar.Source, @"\s+", " ").Trim();
-            if (one_line_result.Length > 20)
-               one_line_result = ($"{one_line_result.Substring(0, 20).Trim()}...");
-            txtInput.WriteLine($"{one_line_result} ({svar.Source.Length} characters)");
-            txtResult.AppendText(svar.Source);
+            var oneLineResult = System.Text.RegularExpressions.Regex.Replace(resp.Source, @"\s+", " ").Trim();
+            if (oneLineResult.Length > 20)
+               oneLineResult = ($"{oneLineResult.Substring(0, 20).Trim()}...");
+            txtInput.WriteLine($"{oneLineResult} ({resp.Source.Length} characters)");
+            txtResult.AppendText(resp.Source);
             txtResult.AppendText("\n");
-            if (svar.LeadingTrivia.Count > 0)
+            if (resp.LeadingTrivia.Count > 0)
             {
                txtResult.AppendText("\nLEADING:\n");
-               svar.LeadingTrivia.ForEach(x => txtResult.AppendText(x + "\n"));
+               resp.LeadingTrivia.ForEach(x => txtResult.AppendText(x + "\n"));
             }
-            if (svar.TrailingTrivia.Count > 0)
+            if (resp.TrailingTrivia.Count > 0)
             {
                txtResult.AppendText("\nTRAILING:\n");
-               svar.TrailingTrivia.ForEach(x => txtResult.AppendText(x + "\n"));
+               resp.TrailingTrivia.ForEach(x => txtResult.AppendText(x + "\n"));
             }
             txtResult.SelectionStart = 0;
             txtResult.ScrollToCaret();
@@ -156,17 +149,17 @@ namespace CodeSearchTreeTest
       {
          if (!(e.Data.GetDataPresent("FileNameW")))
          {
-            MessageBox.Show("Nothing loadable found.", "Open file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(@"Nothing loadable found.", @"Open file", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
          }
          var data = e.Data.GetData("FileNameW") as string[];
          if (data == null || data.Length <= 0)
          {
-            MessageBox.Show("Nothing loadable found.", "Open file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(@"Nothing loadable found.", @"Open file", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
          }
 #if DEBUG
-         this.LoadCs(data[0]);
+         LoadCs(data[0]);
 #else
          try
          {
@@ -190,15 +183,13 @@ namespace CodeSearchTreeTest
 
       private void treeView1_MouseDown(object sender, MouseEventArgs e)
       {
-         var current_button = (int)e.Button;
-         var right_button = (int)MouseButtons.Right;
-         if ((current_button & right_button) <= 0)
+         var currentButton = (int)e.Button;
+         const int rightButton = (int)MouseButtons.Right;
+         if ((currentButton & rightButton) <= 0)
             return;
 
          var n = treeView1.GetNodeAt(e.X, e.Y);
-         if (n == null)
-            return;
-         if (n.Tag as CodeSearchTree.Node == null)
+          if (!(n?.Tag is Node))
             return;
 
          treeView1.SelectedNode = n;
@@ -207,7 +198,7 @@ namespace CodeSearchTreeTest
 
       private void viewSourceToolStripMenuItem_Click(object sender, EventArgs e)
       {
-         var n = treeView1.SelectedNode?.Tag as CodeSearchTree.Node;
+         var n = treeView1.SelectedNode?.Tag as Node;
          if (n == null)
             return;
          txtResult.WordWrap = false;
@@ -222,7 +213,10 @@ namespace CodeSearchTreeTest
       private void btnHelp_Click(object sender, EventArgs e)
       {
          txtResult.WordWrap = true;
-         txtResult.Text = @"SEARCH EXPRESSIONS
+         txtResult.Text = $@"SEARCH TREE version {Assembly.GetExecutingAssembly().GetName().Version}
+Project homepage: https://github.com/Anders-H/CodeSearchTree
+
+SEARCH EXPRESSIONS
 A search expression is a slash separated list of nodes. To get from a namespace to a method via a class, type:
 
 namespace/class/method
@@ -264,7 +258,7 @@ Search for file that contains node a class named MyClass:
       {
          txtResult.Text = "";
          txtResult.WordWrap = false;
-         var n = treeView1.SelectedNode.Tag as CodeSearchTree.Node;
+         var n = treeView1.SelectedNode.Tag as Node;
          if (n == null)
             return;
          txtResult.Text = n.RoslynNodePropertiesString;
@@ -273,16 +267,14 @@ Search for file that contains node a class named MyClass:
       private void btnFindFile_Click(object sender, EventArgs e)
       {
          using (var x = new FindFileDialog())
-         {
             if (x.ShowDialog(this) == DialogResult.OK)
-               this.LoadCs(x.SelectedFilename);
-         }
+               LoadCs(x.SelectedFilename);
       }
 
         private void txtInput_Entered(object arg1, TextEnteredEventArgs arg2)
         {
             txtInput.WriteLine($"Search for \"{arg2.Entered}\".");
-            this.DoSearch(arg2.Entered);
+            DoSearch(arg2.Entered);
         }
     }
 }

@@ -3,7 +3,7 @@ Simple Roslyn based code analysis library.
 
 CodeSearchTree.dll uses Roslyn but does not require that your program references Roslyn.
 
-##Install version 1.0.2 from NuGet:
+##Install version 1.0.3 from NuGet:
 
 `Install-Package CodeSearchTree`
 
@@ -31,15 +31,19 @@ The node type can be unspecified. This will give you anything named `MyFunction`
 
 `ns/cls/*[MyFunction]`
 
+Read the value of a constant called `MyConstant` from file root:
+
+`ns/cls/field[MyConstant]/vardeclaration/vardeclarator/equalsvalue/literal`
+
 And this will deliver the first node with two parent nodes, regardless of name and type:
 
 `*/*/*`
 
-Attribute filter:
+*Attribute* filter:
 
 `ns/cls/method[@MyAttribute]`
 
-Return type filter:
+*Return type* filter:
 
 `ns/cls/property[#string]`
 
