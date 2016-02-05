@@ -10,8 +10,27 @@ using System.Diagnostics;
 
 namespace CodeSearchTree
 {
-    public class Node
+    public class Node : ITypedSearch, ITypedChild
     {
+        //Typed search.
+        public TypedSearchNode Assign => new TypedSearchNode(NodeType.AssignmentExpressionSyntaxNode, this);
+        public TypedSearchNode Block => new TypedSearchNode(NodeType.BlockSyntaxNode, this);
+        public TypedSearchNode Cls => new TypedSearchNode(NodeType.ClassDeclarationSyntaxNode, this);
+        public TypedSearchNode Constructor => new TypedSearchNode(NodeType.ConstructorDeclarationSyntaxNode, this);
+        public TypedSearchNode EqualsValue => new TypedSearchNode(NodeType.EqualsValueClauseSyntaxNode, this);
+        public TypedSearchNode Expression => new TypedSearchNode(NodeType.ExpressionStatementSyntaxNode, this);
+        public TypedSearchNode Field => new TypedSearchNode(NodeType.FieldDeclarationSyntaxNode, this);
+        public TypedSearchNode Id => new TypedSearchNode(NodeType.IdentifierNameSyntaxNode, this);
+        public TypedSearchNode Invocation => new TypedSearchNode(NodeType.InvocationExpressionSyntaxNode, this);
+        public TypedSearchNode Literal => new TypedSearchNode(NodeType.LiteralExpressionSyntaxNode, this);
+        public TypedSearchNode MemberAccess => new TypedSearchNode(NodeType.MemberAccessExpressionSyntaxNode, this);
+        public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
+        public TypedSearchNode UsingDirective => new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, this);
+        public TypedSearchNode VarDeclarator => new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, this);
+        public TypedSearchNode VarDeclaration => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
+
+        //End typed search.
+
         [Category("Meta"), Description("Enumeration of Roslyn types.")]
         public NodeType NodeType { get; internal set; }
 
@@ -320,15 +339,15 @@ namespace CodeSearchTree
                     SearchNode.CreateSearchByType(NodeType.AttributeSyntaxNode)
                 };
                 var att = GetChild(searchExpression);
-                if (!(att == null))
+                if (att != null)
                 {
                     Attributes.Add(att.Name);
                     do
                     {
                         att = att.GetNextSibling();
-                        if (!(att == null) && att.NodeType == NodeType.AttributeSyntaxNode)
+                        if (att != null && att.NodeType == NodeType.AttributeSyntaxNode)
                             Attributes.Add(att.Name);
-                    } while (!(att == null));
+                    } while (att != null);
 
                 }
 
@@ -767,11 +786,13 @@ namespace CodeSearchTree
         public static SearchNodeList ParseSearchExpression(string searchExpression) =>
             new SearchExpressionParser(searchExpression).Parse();
 
-        public Node GetNextSibling() =>
-            Parent?.Children.GetNextSibling(this);
+        public Node GetNextSibling() => Parent?.Children.GetNextSibling(this);
 
-        public Node GetPreviousSibling() =>
-            Parent?.Children.GetPreviousSibling(this);
+        public Node GetPreviousSibling() => Parent?.Children.GetPreviousSibling(this);
+
+        public Node GetFirstSibling() => Parent?.Children.FirstOrDefault();
+
+        public Node GetLastSibling() => Parent?.Children.LastOrDefault();
 
         private static Trivia.TriviaTypes GetTriviaType(SyntaxTrivia t)
         {

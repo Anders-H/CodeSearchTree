@@ -5,8 +5,25 @@ using System.Text;
 
 namespace CodeSearchTree
 {
-    public class NodeList : List<Node>
+    public class NodeList : List<Node>, ITypedSearch, ITypedChild
     {
+        //Typed search.
+        public TypedSearchNode Assign => new TypedSearchNode(NodeType.AssignmentExpressionSyntaxNode, this);
+        public TypedSearchNode Block => new TypedSearchNode(NodeType.BlockSyntaxNode, this);
+        public TypedSearchNode Cls => new TypedSearchNode(NodeType.ClassDeclarationSyntaxNode, this);
+        public TypedSearchNode Constructor => new TypedSearchNode(NodeType.ConstructorDeclarationSyntaxNode, this);
+        public TypedSearchNode EqualsValue => new TypedSearchNode(NodeType.EqualsValueClauseSyntaxNode, this);
+        public TypedSearchNode Expression => new TypedSearchNode(NodeType.ExpressionStatementSyntaxNode, this);
+        public TypedSearchNode Field => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
+        public TypedSearchNode Id => new TypedSearchNode(NodeType.IdentifierNameSyntaxNode, this);
+        public TypedSearchNode Invocation => new TypedSearchNode(NodeType.InvocationExpressionSyntaxNode, this);
+        public TypedSearchNode Literal => new TypedSearchNode(NodeType.LiteralExpressionSyntaxNode, this);
+        public TypedSearchNode MemberAccess => new TypedSearchNode(NodeType.MemberAccessExpressionSyntaxNode, this);
+        public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
+        public TypedSearchNode UsingDirective => new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, this);
+        public TypedSearchNode VarDeclaration => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
+        public TypedSearchNode VarDeclarator => new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, this);
+        //End typed search.
 
         /// <summary>
         ///     Returns subset of nodes that matches given SearchNode.
@@ -51,13 +68,10 @@ namespace CodeSearchTree
         {
             var ret = new NodeList();
             ret.AddRange(this.Where(x => type == NodeType.Any || x.NodeType == type));
-            if (recursive)
-                foreach (var n in this)
-                {
-                    var list = n.Children.GetByNodesType(type, true);
-                    if (list.Count > 0)
-                        ret.AddRange(list);
-                }
+            if (!recursive)
+                return ret;
+            foreach (var list in this.Select(n => n.Children.GetByNodesType(type, true)).Where(list => list.Count > 0))
+                ret.AddRange(list);
             return ret;
         }
 
@@ -182,24 +196,14 @@ namespace CodeSearchTree
             var svar = GetChild(parsedSearchExpression);
             if (svar != null)
                 ret.Add(svar);
-            foreach (var child in this)
-            {
-                var childSvar = child.GetChild(parsedSearchExpression);
-                if (childSvar != null)
-                    ret.Add(childSvar);
-            }
+            ret.AddRange(this.Select(child => child.GetChild(parsedSearchExpression)).Where(childSvar => childSvar != null));
             ForEach(x => DeepSearchChild(parsedSearchExpression, ref ret, x));
             return ret;
         }
 
         private void DeepSearchChild(SearchNode[] parsedSearchExpression, ref NodeList result, Node n)
         {
-            foreach (var child in n.Children)
-            {
-                var childSvar = child.GetChild(parsedSearchExpression);
-                if (childSvar != null)
-                    result.Add(childSvar);
-            }
+            result.AddRange(n.Children.Select(child => child.GetChild(parsedSearchExpression)).Where(childSvar => childSvar != null));
             foreach (var child in n.Children)
                 DeepSearchChild(parsedSearchExpression, ref result, child);
         }

@@ -98,6 +98,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileSystem.cs" />
+    <Compile Include="ITypedChild.cs" />
+    <Compile Include="ITypedSearch.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="NodeList.cs" />
     <Compile Include="NodeType.cs" />
@@ -109,6 +111,7 @@
     <Compile Include="SearchNodeList.cs" />
     <Compile Include="Trivia.cs" />
     <Compile Include="TriviaList.cs" />
+    <Compile Include="TypedSearchNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

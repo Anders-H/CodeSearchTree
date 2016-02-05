@@ -1,9 +1,9 @@
-# CodeSearchTree
+re# CodeSearchTree
 Simple Roslyn based code analysis library.
 
 CodeSearchTree.dll uses Roslyn but does not require that your program references Roslyn.
 
-##Install version 1.0.3 from NuGet:
+##Install version 1.0.4 from NuGet:
 
 `Install-Package CodeSearchTree`
 
@@ -85,6 +85,17 @@ Given that `my_class` references to a class, find property or method in a class 
 var x = my_class.GetChild("*[#int]");
 ```
 
+Load a class file and get a reference to its constructor using the stronly typed API of CodeSearchTree.
+
+```C#
+//Load the C# class file.
+var tree = CodeSearchTree.Node.CreateTreeFromFile(@"MyClass.cs");
+
+//Get the first expression in the constructor.
+var exp = tree.Ns.Cls.Constructor.SearchResult;
+```
+
 ##Use cases
 
-- [Read name and values from constants](http://www.winsoft.se/2015/12/codesearchtree-use-case-read-constant-values/)
+- [Read name and value from constants](http://www.winsoft.se/2015/12/codesearchtree-use-case-read-constant-values/)
+- [List all invocations in constructor of a class](http://www.winsoft.se/2016/02/list-invocations-in-constructor/)

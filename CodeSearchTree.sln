@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeSearchTree", "CodeSearchTree\CodeSearchTree.csproj", "{6FA9DD57-A565-4D7E-B2F8-CA7D7F640C11}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeTree", "CodeSearchTreeTest\CodeTree.csproj", "{8C79E75B-9F39-405C-8ED4-1204714B5DA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{B0725DD0-A648-4D66-960F-06637210EF1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{8C79E75B-9F39-405C-8ED4-1204714B5DA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C79E75B-9F39-405C-8ED4-1204714B5DA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C79E75B-9F39-405C-8ED4-1204714B5DA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0725DD0-A648-4D66-960F-06637210EF1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0725DD0-A648-4D66-960F-06637210EF1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0725DD0-A648-4D66-960F-06637210EF1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0725DD0-A648-4D66-960F-06637210EF1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
