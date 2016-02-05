@@ -1,4 +1,4 @@
-re# CodeSearchTree
+#CodeSearchTree
 Simple Roslyn based code analysis library.
 
 CodeSearchTree.dll uses Roslyn but does not require that your program references Roslyn.
