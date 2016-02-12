@@ -106,6 +106,7 @@
     <None Include="Resources\Help.png" />
     <None Include="Resources\openHS.png" />
     <None Include="Resources\EditCodeHS.png" />
+    <None Include="Resources\PropertiesHS.png" />
     <Content Include="Star Wars - R2-D2 %283%29.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

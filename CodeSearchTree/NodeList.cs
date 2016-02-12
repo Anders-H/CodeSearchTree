@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -8,20 +9,49 @@ namespace CodeSearchTree
     public class NodeList : List<Node>, ITypedSearch, ITypedChild
     {
         //Typed search.
+        [Browsable(false)]
+        public TypedSearchNode Arg => new TypedSearchNode(NodeType.ArgumentSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode ArgList => new TypedSearchNode(NodeType.ArgumentListSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Assign => new TypedSearchNode(NodeType.AssignmentExpressionSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode BaseList => new TypedSearchNode(NodeType.BaseListSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode BaseType => new TypedSearchNode(NodeType.SimpleBaseTypeSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Block => new TypedSearchNode(NodeType.BlockSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Cls => new TypedSearchNode(NodeType.ClassDeclarationSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Constructor => new TypedSearchNode(NodeType.ConstructorDeclarationSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode EqualsValue => new TypedSearchNode(NodeType.EqualsValueClauseSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Expression => new TypedSearchNode(NodeType.ExpressionStatementSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Field => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Id => new TypedSearchNode(NodeType.IdentifierNameSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode If => new TypedSearchNode(NodeType.IfStatementSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Invocation => new TypedSearchNode(NodeType.InvocationExpressionSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Literal => new TypedSearchNode(NodeType.LiteralExpressionSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode MemberAccess => new TypedSearchNode(NodeType.MemberAccessExpressionSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode Method => new TypedSearchNode(NodeType.MethodDeclarationSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode Property => new TypedSearchNode(NodeType.PropertyDeclarationSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode UsingDirective => new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode VarDeclaration => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode VarDeclarator => new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, this);
         //End typed search.
 
