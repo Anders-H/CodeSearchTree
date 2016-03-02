@@ -2,13 +2,13 @@
 {
     public class SearchNode
     {
-        private SearchNode(NodeType nodeType, int index, string name, string returnType, string AttributeName)
+        private SearchNode(NodeType nodeType, int index, string name, string returnType, string attributeName)
         {
             NodeType = nodeType;
             Index = index;
             Name = name;
             ReturnType = returnType;
-            AttributeName = "";
+            AttributeName = attributeName;
         }
 
         public static SearchNode CreateSearchByType(NodeType nodeType)

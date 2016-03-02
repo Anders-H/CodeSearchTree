@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp;
@@ -709,14 +708,7 @@ namespace CodeSearchTree
                 return NodeType.ArrayCreationExpressionSyntaxNode;
             if (n is FinallyClauseSyntax)
                 return NodeType.FinallyClauseSyntaxNode;
-#if DEBUG
-            Console.WriteLine(n.GetType().Name);
-            var code = n.ToString().Length > 40 ? n.ToString().Substring(0, 40) : n.ToString();
-            Console.WriteLine(code);
-            throw new Exception(n.GetType().Name);
-#else
             return NodeType.UnknownNode;
-#endif
         }
 
         private static void StoreTrivia(Node node, SyntaxNode roslynNode)
@@ -846,19 +838,26 @@ namespace CodeSearchTree
                 return Trivia.TriviaTypes.LineDirectiveTriviaType;
             if (t.Kind() == SyntaxKind.EndIfDirectiveTrivia)
                 return Trivia.TriviaTypes.EndIfDirectiveTriviaType;
-            else
-            {
-#if DEBUG
-                Console.WriteLine(t.GetType().Name);
-                var code = t.ToString().Length > 50 ? t.ToString().Substring(0, 50) : t.ToString();
-                Console.WriteLine(code);
-                throw new Exception(t.Kind().ToString());
-#else
             return Trivia.TriviaTypes.UnknownTriviaSyntaxType;
-#endif
-            }
         }
 
         public override string ToString() => string.IsNullOrEmpty(Name) ? NodeType.ToString() : $"{NodeType}[{Name}]";
+
+        /// <summary>
+        /// Returns all siblings of the same type.
+        /// </summary>
+        /// <returns></returns>
+        public List<Node> WithSiblings()
+        {
+            var ret = new List<Node>();
+            var x = GetFirstSibling();
+            while (x != null)
+            {
+                if (x.NodeType == NodeType)
+                    ret.Add(x);
+                x = x.GetNextSibling();
+            }
+            return ret;
+        }
     }
 }

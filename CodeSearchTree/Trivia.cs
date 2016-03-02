@@ -22,9 +22,9 @@
         {
         }
 
-        internal Trivia(TriviaTypes trivia_types, string source)
+        internal Trivia(TriviaTypes triviaTypes, string source)
         {
-            TriviaType = trivia_types;
+            TriviaType = triviaTypes;
             Source = source;
         }
 

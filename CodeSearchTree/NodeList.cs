@@ -208,6 +208,13 @@ namespace CodeSearchTree
         /// </summary>
         /// <param name="searchExpression"></param>
         /// <returns></returns>
+        public NodeList DeepSearch(SearchNodeList searchExpression) => DeepSearch(searchExpression.ToArray());
+
+        /// <summary>
+        ///     Returns the first representation of a matching node at level in the code tree.
+        /// </summary>
+        /// <param name="searchExpression"></param>
+        /// <returns></returns>
         public NodeList DeepSearch(string searchExpression)
         {
             var separser = new SearchExpressionParser(searchExpression);

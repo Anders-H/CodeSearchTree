@@ -56,9 +56,9 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ddProperty = new System.Windows.Forms.ToolStripDropDownButton();
             this.menuFullPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.nameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuPossibleAlternativePath = new System.Windows.Forms.ToolStripMenuItem();
             this.lblProperty = new System.Windows.Forms.ToolStripStatusLabel();
-            this.nameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -353,6 +353,12 @@
             this.menuFullPath.Size = new System.Drawing.Size(198, 22);
             this.menuFullPath.Text = "FullPath";
             // 
+            // nameToolStripMenuItem
+            // 
+            this.nameToolStripMenuItem.Name = "nameToolStripMenuItem";
+            this.nameToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.nameToolStripMenuItem.Text = "Name";
+            // 
             // menuPossibleAlternativePath
             // 
             this.menuPossibleAlternativePath.Name = "menuPossibleAlternativePath";
@@ -364,12 +370,6 @@
             this.lblProperty.Name = "lblProperty";
             this.lblProperty.Size = new System.Drawing.Size(16, 17);
             this.lblProperty.Text = "   ";
-            // 
-            // nameToolStripMenuItem
-            // 
-            this.nameToolStripMenuItem.Name = "nameToolStripMenuItem";
-            this.nameToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
-            this.nameToolStripMenuItem.Text = "Name";
             // 
             // Form1
             // 
