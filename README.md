@@ -3,7 +3,7 @@ Simple Roslyn based code analysis library.
 
 CodeSearchTree.dll uses Roslyn but does not require that your program references Roslyn.
 
-##Install version 1.0.5 from NuGet:
+##Install version 1.0.6 from NuGet:
 
 `Install-Package CodeSearchTree`
 
