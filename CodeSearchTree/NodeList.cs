@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CodeSearchTree
 {
-    public class NodeList : List<Node>, ITypedSearch, ITypedChild
+    public class NodeList : List<Node>, ITypedSearch, ITypedChild, INode
     {
+        public bool EntityIsNode => false;
+        public bool EntityIsNodeList => true;
+
         //Typed search.
         [Browsable(false)]
         public TypedSearchNode Arg => new TypedSearchNode(NodeType.ArgumentSyntaxNode, this);
@@ -44,6 +48,8 @@ namespace CodeSearchTree
         [Browsable(false)]
         public TypedSearchNode Method => new TypedSearchNode(NodeType.MethodDeclarationSyntaxNode, this);
         [Browsable(false)]
+        public TypedSearchNode New => new TypedSearchNode(NodeType.ObjectCreationExpressionSyntaxNode, this);
+        [Browsable(false)]
         public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
         [Browsable(false)]
         public TypedSearchNode Property => new TypedSearchNode(NodeType.PropertyDeclarationSyntaxNode, this);
@@ -54,6 +60,44 @@ namespace CodeSearchTree
         [Browsable(false)]
         public TypedSearchNode VarDeclarator => new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, this);
         //End typed search.
+
+        /// <summary>
+        /// Creates a parsed C# tree from a given .cs file.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static NodeList CreateTreeFromFile(string filename)
+        {
+            string code;
+            using (var sr = new System.IO.StreamReader(filename, Encoding.UTF8))
+                code = sr.ReadToEnd();
+            return CreateTreeFromCode(code);
+        }
+
+        /// <summary>
+        /// Creates a parsed C# tree from a string of C# code.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static NodeList CreateTreeFromCode(string code)
+        {
+            var ret = new NodeList();
+            var tree = CSharpSyntaxTree.ParseText(code).GetRoot();
+            foreach (var n in tree.ChildNodes())
+            {
+                var codeNode = new Node(n, n.ToString(), null, Node.GetNodeType(n)) { ParentListIfNoParent = ret };
+                Node.StoreTrivia(codeNode, n);
+                ret.Add(codeNode);
+                Node.CreateChildren(codeNode, n);
+            }
+            //First iteration: Read out names.
+            ret.ForEach(x => x.CheckName());
+            //Second iteration: Read out property types and method return types.
+            ret.ForEach(x => x.CheckReturnType());
+            //Third iteration: Read out attribute names. No support for parameters.
+            ret.ForEach(x => x.CheckAttributes());
+            return ret;
+        }
 
         /// <summary>
         ///     Returns subset of nodes that matches given SearchNode.
@@ -148,25 +192,6 @@ namespace CodeSearchTree
             throw new Exception("Confusion!!!");
         }
 
-        public Node GetChild(string searchExpression) =>
-            //Använd första uttrycket för att hitta rätt i den egna samlingen,
-            //skicka eventuell rest till den första träffen för vidare sökning.
-            GetChild(new SearchExpressionParser(searchExpression).Parse().ToArray());
-
-        public Node GetChild(params SearchNode[] parsedSearchExpression)
-        {
-            if (parsedSearchExpression.Length == 0)
-                return null;
-            if (parsedSearchExpression.Length == 1)
-                return GetNodeByType(parsedSearchExpression[0]);
-            var restParts = new SearchNodeList();
-            restParts.AddRange(parsedSearchExpression);
-            var firstPart = restParts[0];
-            restParts.RemoveAt(0);
-            var firstResult = GetNodeByType(firstPart);
-            return firstResult?.GetChild(restParts.ToArray());
-        }
-
         public override string ToString()
         {
             var s = new StringBuilder();
@@ -243,6 +268,89 @@ namespace CodeSearchTree
             result.AddRange(n.Children.Select(child => child.GetChild(parsedSearchExpression)).Where(childSvar => childSvar != null));
             foreach (var child in n.Children)
                 DeepSearchChild(parsedSearchExpression, ref result, child);
+        }
+
+        /// <summary>
+        /// Returns all child nodes of the given nodetypes.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public NodeList GetChildren(NodeType[] type) => DoGetChildren(type, this);
+
+        /// <summary>
+        /// Returns the first child node of any of the given types.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public Node GetChild(params NodeType[] type) => GetChildren(type).FirstOrDefault();
+
+        /// <summary>
+        /// Returns the first child node that matches the given search expression.
+        /// </summary>
+        /// <param name="searchExpression"></param>
+        /// <returns></returns>
+        public Node GetChild(string searchExpression) => GetChild(new SearchExpressionParser(searchExpression).Parse().ToArray());
+
+        /// <summary>
+        /// Returns the first child node that matches the given search expression.
+        /// </summary>
+        /// <param name="sn"></param>
+        /// <returns></returns>
+        public Node GetChild(params SearchNode[] sn) => DoGetChild(this, sn);
+
+        internal static NodeList DoGetChildren(NodeType[] type, NodeList searchList)
+        {
+            if (type.Length <= 0)
+                return new NodeList();
+            if (type.Length == 1)
+                return searchList.Filter(SearchNode.CreateSearchByType(type[0]));
+            if (type.Length == 2)
+            {
+                var ret = new NodeList();
+                var item = searchList.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
+                if (item == null)
+                    return ret;
+                ret.AddRange(item.Children.Filter(SearchNode.CreateSearchByType(type[1])));
+                return ret;
+            }
+            else
+            {
+                var item = searchList.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
+                for (var i = 1; i < type.Length - 1; i++)
+                {
+                    if (item == null)
+                        return new NodeList();
+                    item = item.Children.Filter(SearchNode.CreateSearchByType(type[i])).FirstOrDefault();
+                }
+
+                if (item == null)
+                    return new NodeList();
+                return item.Children.Filter(SearchNode.CreateSearchByType(type[type.Length - 1]));
+            }
+        }
+
+        internal static Node DoGetChild(NodeList searchList, params SearchNode[] sn)
+        {
+            if (sn.Length == 0)
+                return null;
+            if (sn.Length == 1)
+                return searchList.Filter(sn[0]).FirstOrDefault();
+            if (sn.Length == 2)
+            {
+                var item = searchList.Filter(sn[0]).FirstOrDefault();
+                return item?.Children.Filter(sn[1]).FirstOrDefault();
+            }
+            else
+            {
+                var item = searchList.Filter(sn[0]).FirstOrDefault();
+                for (int i = 1; i < (sn.Length - 1); i++)
+                {
+                    if (item == null)
+                        return null;
+                    item = item.Children.Filter(sn[i]).FirstOrDefault();
+                }
+                return item?.Children.Filter(sn[sn.Length - 1]).FirstOrDefault();
+            }
         }
     }
 }

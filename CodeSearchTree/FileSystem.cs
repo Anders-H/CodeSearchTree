@@ -39,6 +39,13 @@ namespace CodeSearchTree
             return files.Select(file => Node.CreateTreeFromFile(file.FullName)).Where(tree => tree.DeepSearch(searchNodes).Count > 0).ToList();
         }
 
+        /// <summary>
+        /// Returns all .cs files in a given directory.
+        /// </summary>
+        /// <param name="directoryName">A folder containing the files to be returned.</param>
+        /// <param name="includeChildDirectories"></param>
+        /// <param name="approximatelyMaximumResult"></param>
+        /// <returns></returns>
         public static List<FileInfo> GetCsFiles(string directoryName, bool includeChildDirectories, int approximatelyMaximumResult)
         {
             var ret = new List<FileInfo>();

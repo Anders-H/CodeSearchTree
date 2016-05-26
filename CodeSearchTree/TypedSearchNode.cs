@@ -20,6 +20,7 @@
         public TypedSearchNode Invocation => new TypedSearchNode(NodeType.InvocationExpressionSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode MemberAccess => new TypedSearchNode(NodeType.MemberAccessExpressionSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode Method => new TypedSearchNode(NodeType.MethodDeclarationSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
+        public TypedSearchNode New => new TypedSearchNode(NodeType.ObjectCreationExpressionSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode Property => new TypedSearchNode(NodeType.PropertyDeclarationSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode UsingDirective => new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));

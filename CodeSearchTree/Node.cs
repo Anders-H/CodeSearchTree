@@ -9,8 +9,11 @@ using System.Diagnostics;
 
 namespace CodeSearchTree
 {
-    public class Node : ITypedSearch, ITypedChild
+    public class Node : ITypedSearch, ITypedChild, INode
     {
+        public bool EntityIsNode => false;
+        public bool EntityIsNodeList => true;
+
         //Typed search.
         [Browsable(false)]
         public TypedSearchNode Arg => new TypedSearchNode(NodeType.ArgumentSyntaxNode, this);
@@ -46,6 +49,8 @@ namespace CodeSearchTree
         public TypedSearchNode MemberAccess => new TypedSearchNode(NodeType.MemberAccessExpressionSyntaxNode, this);
         [Browsable(false)]
         public TypedSearchNode Method => new TypedSearchNode(NodeType.MethodDeclarationSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode New => new TypedSearchNode(NodeType.ObjectCreationExpressionSyntaxNode, this);
         [Browsable(false)]
         public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
         [Browsable(false)]
@@ -132,12 +137,9 @@ namespace CodeSearchTree
             {
                 if (Attributes.Count == 0)
                     return "";
-                else
-                {
-                    var s = new StringBuilder();
-                    Attributes.ForEach(x => s.Append($"{x}{(x == Attributes.Last() ? "" : ", ")}"));
-                    return s.ToString();
-                }
+                var s = new StringBuilder();
+                Attributes.ForEach(x => s.Append($"{x}{(x == Attributes.Last() ? "" : ", ")}"));
+                return s.ToString();
             }
         }
 
@@ -178,8 +180,7 @@ namespace CodeSearchTree
             }
         }
 
-        [Category("Roslyn"), Description("String representation of the properties of the underlying Roslyn SyntaxNode.")
-        ]
+        [Category("Roslyn"), Description("String representation of the properties of the underlying Roslyn SyntaxNode.")]
         public string RoslynNodePropertiesString
         {
             get
@@ -190,6 +191,11 @@ namespace CodeSearchTree
             }
         }
 
+        /// <summary>
+        /// Creates a parsed C# tree from a given .cs file.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static NodeList CreateTreeFromFile(string filename)
         {
             string code;
@@ -198,6 +204,11 @@ namespace CodeSearchTree
             return CreateTreeFromCode(code);
         }
 
+        /// <summary>
+        /// Creates a parsed C# tree from a string of C# code.
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public static NodeList CreateTreeFromCode(string code)
         {
             var ret = new NodeList();
@@ -245,6 +256,9 @@ namespace CodeSearchTree
             return false;
         }
 
+        /// <summary>
+        /// Calculates the index of this node in it's containing collection, when the collection is filtered on the same node type as this node.
+        /// </summary>
         public int TypeFilteredIndex
         {
             get
@@ -254,7 +268,10 @@ namespace CodeSearchTree
                 return subset.IndexOf(this);
             }
         }
-        
+
+        /// <summary>
+        /// Calculates the index of this node in it's containing collection.
+        /// </summary>
         public int ActualIndex
         {
             get
@@ -264,7 +281,7 @@ namespace CodeSearchTree
             }
         }
 
-        private void CheckName()
+        internal void CheckName()
         {
             var n = RoslynNode as SyntaxNode;
             if (n != null)
@@ -340,7 +357,7 @@ namespace CodeSearchTree
                 child.CheckName();
         }
 
-        private void CheckReturnType()
+        internal void CheckReturnType()
         {
             var n = RoslynNode as SyntaxNode;
             if (n != null)
@@ -356,7 +373,7 @@ namespace CodeSearchTree
                 child.CheckReturnType();
         }
 
-        private void CheckAttributes()
+        internal void CheckAttributes()
         {
             //Checking for attributes only on classes, methods and properties.
             if (NodeType == NodeType.ClassDeclarationSyntaxNode || NodeType == NodeType.MethodDeclarationSyntaxNode || NodeType == NodeType.PropertyDeclarationSyntaxNode)
@@ -383,7 +400,7 @@ namespace CodeSearchTree
                 child.CheckAttributes();
         }
 
-        private static void CreateChildren(Node node, SyntaxNode roslynNode)
+        internal static void CreateChildren(Node node, SyntaxNode roslynNode)
         {
             foreach (var n in roslynNode.ChildNodes())
             {
@@ -506,7 +523,7 @@ namespace CodeSearchTree
             }
         }
 
-        private static NodeType GetNodeType(SyntaxNode n)
+        internal static NodeType GetNodeType(SyntaxNode n)
         {
             if (n is UsingDirectiveSyntax)
                 return NodeType.UsingDirectiveSyntaxNode;
@@ -711,7 +728,7 @@ namespace CodeSearchTree
             return NodeType.UnknownNode;
         }
 
-        private static void StoreTrivia(Node node, SyntaxNode roslynNode)
+        internal static void StoreTrivia(Node node, SyntaxNode roslynNode)
         {
             foreach (var t in roslynNode.GetLeadingTrivia())
             {
@@ -727,63 +744,33 @@ namespace CodeSearchTree
             }
         }
 
-        public NodeList GetChildren(NodeType[] type)
-        {
-            if (type.Length <= 0)
-                return new NodeList();
-            if (type.Length == 1)
-                return Children.Filter(SearchNode.CreateSearchByType(type[0]));
-            if (type.Length == 2)
-            {
-                var ret = new NodeList();
-                var item = Children.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
-                if (item == null)
-                    return ret;
-                ret.AddRange(item.Children.Filter(SearchNode.CreateSearchByType(type[1])));
-                return ret;
-            }
-            else
-            {
-                var item = Children.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
-                for (int i = 1; i < type.Length - 1; i++)
-                {
-                    if (item == null)
-                        return new NodeList();
-                    item = item.Children.Filter(SearchNode.CreateSearchByType(type[i])).FirstOrDefault();
-                }
-                if (item == null)
-                    return new NodeList();
-                return item.Children.Filter(SearchNode.CreateSearchByType(type[type.Length - 1]));
-            }
-        }
+        /// <summary>
+        /// Returns all child nodes of the given nodetypes.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public NodeList GetChildren(NodeType[] type) => NodeList.DoGetChildren(type, Children);
 
+        /// <summary>
+        /// Returns the first child node of any of the given types.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public Node GetChild(params NodeType[] type) => GetChildren(type).FirstOrDefault();
 
+        /// <summary>
+        /// Returns the first child node that matches the given search expression.
+        /// </summary>
+        /// <param name="searchExpression"></param>
+        /// <returns></returns>
         public Node GetChild(string searchExpression) => GetChild(new SearchExpressionParser(searchExpression).Parse().ToArray());
 
-        public Node GetChild(params SearchNode[] sn)
-        {
-            if (sn.Length == 0)
-                return null;
-            if (sn.Length == 1)
-                return Children.Filter(sn[0]).FirstOrDefault();
-            if (sn.Length == 2)
-            {
-                var item = Children.Filter(sn[0]).FirstOrDefault();
-                return item?.Children.Filter(sn[1]).FirstOrDefault();
-            }
-            else
-            {
-                var item = Children.Filter(sn[0]).FirstOrDefault();
-                for (int i = 1; i < (sn.Length - 1); i++)
-                {
-                    if (item == null)
-                        return null;
-                    item = item.Children.Filter(sn[i]).FirstOrDefault();
-                }
-                return item?.Children.Filter(sn[sn.Length - 1]).FirstOrDefault();
-            }
-        }
+        /// <summary>
+        /// Returns the first child node that matches the given search expression.
+        /// </summary>
+        /// <param name="sn"></param>
+        /// <returns></returns>
+        public Node GetChild(params SearchNode[] sn) => NodeList.DoGetChild(Children, sn);
 
         public static SearchNodeList ParseSearchExpression(string searchExpression, out bool success)
         {

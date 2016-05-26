@@ -19,7 +19,7 @@ namespace UnitTests
             Assert.IsTrue(tree.Ns[0].Source.StartsWith("namespace Company.STA_PSPEC_AMT.BusinessLogic.Database"),
                 "Find namespace, indexer.");
             Assert.IsTrue(
-                tree.Ns.SearchResult.Source.StartsWith("namespace Company.STA_PSPEC_AMT.BusinessLogic.Database"),
+                tree.Ns.SearchResult.Source.StartsWith("namespace TS.GUNNAR.BusinessLogic.Database {"),
                 "Find namespace, no indexer.");
             Assert.IsTrue(tree.Ns[0].Cls[0].Source.StartsWith("public sealed class A5560"), "Find class, indexers.");
             Assert.IsTrue(tree.Ns.Cls.SearchResult.Source.StartsWith("public sealed class A5560"),

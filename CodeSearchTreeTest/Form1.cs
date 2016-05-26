@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -42,8 +41,7 @@ namespace CodeSearchTreeTest
         {
             foreach (var i in ddProperty.DropDownItems)
                 ((ToolStripMenuItem)i).Checked = false;
-            var m = sender as ToolStripMenuItem;
-            Debug.Assert(m != null, "m != null");
+            var m = (ToolStripMenuItem)sender;
             m.Checked = true;
             ToolStripSelectedProperty = m.Text ?? "";
             RefreshStatusLabel();
@@ -187,7 +185,7 @@ namespace CodeSearchTreeTest
 #else
             try
             {
-                this.LoadCs(data[0]);
+                LoadCs(data[0]);
             }
             catch (Exception ex)
             {
@@ -261,21 +259,21 @@ The node type can be unspecified. This will give you anything named MyFunction i
 
 ns/cls/*[MyFunction]
 
+Read the value of a constant called MyConstant from file root:
+
+ns/cls/field[MyConstant]/vardeclaration/vardeclarator/equalsvalue/literal
+
 And this will deliver the first node with two parent nodes, regardless of name and type:
 
 */*/*
 
-C# EXAMPLES
-Get class node from file:
+Attribute filter:
 
-   var code_tree = CodeSearchTree.Node.CreateTreeFromFile(filename);
-   var my_class = code_tree.GetChild(""ns/cls"");
+ns/cls/method[@MyAttribute]
 
-Search for file that contains node a class named MyClass:
+Return type filter:
 
-   var result = CodeSearchTree.FileSystem.CreateTreesFromFolder(foldername, ""*/cls[MyClass]"");
-   if (result.Count > 0)
-      Console.WriteLine(""Success!"");";
+ns/cls/property[#string]";
         }
 
         private void viewRoslynToolStripMenuItem_Click(object sender, EventArgs e)

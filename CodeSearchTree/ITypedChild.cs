@@ -19,6 +19,7 @@
         TypedSearchNode Literal { get; }
         TypedSearchNode MemberAccess { get; }
         TypedSearchNode Method { get; }
+        TypedSearchNode New { get; }
         TypedSearchNode Ns { get; }
         TypedSearchNode Property { get; }
         TypedSearchNode UsingDirective { get; }

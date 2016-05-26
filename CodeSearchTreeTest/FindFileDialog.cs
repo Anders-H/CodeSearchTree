@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CodeSearchTreeTest
@@ -14,10 +10,9 @@ namespace CodeSearchTreeTest
    public partial class FindFileDialog : Form
    {
       [DllImport("shlwapi.dll", CharSet = CharSet.Auto)]
-      static extern bool PathCompactPathEx([Out] StringBuilder pszOut, string szPath, int cchMax, int dwFlags);
+      private static extern bool PathCompactPathEx([Out] StringBuilder pszOut, string szPath, int cchMax, int dwFlags);
 
       public string SelectedFilename { get; private set; }
-      private CodeSearchTree.SearchNodeList SearchExpression { get; set; }
       private List<System.IO.FileInfo> FileList { get; set; }
       private List<System.IO.FileInfo> SearchResult { get; set; }
       private bool InSearch { get; set; }
@@ -42,152 +37,156 @@ namespace CodeSearchTreeTest
       {
          if (listView1.SelectedItems.Count <= 0)
             return;
-         var selected_file = listView1.SelectedItems[0].Tag as System.IO.FileInfo;
-         if (selected_file == null)
+         var selectedFile = listView1.SelectedItems[0].Tag as System.IO.FileInfo;
+         if (selectedFile == null)
             return;
-         this.SelectedFilename = selected_file.FullName;
-         this.DialogResult = DialogResult.OK;
+         SelectedFilename = selectedFile.FullName;
+         DialogResult = DialogResult.OK;
       }
 
       //Svarar på när användaren vill påbörja sökning eller sätter cancel-flaggan om sökning pågår.
       private void btnSearch_Click(object sender, EventArgs e)
       {
-         if (this.InSearch)
+         if (InSearch)
          {
-            this.CancelFlag = true;
+            CancelFlag = true;
             return;
          }
          txtSearch.Text = txtSearch.Text.Trim();
          if (txtSearch.Text == "")
             return;
-         var success = false;
+         bool success;
          var nodes = CodeSearchTree.Node.ParseSearchExpression(txtSearch.Text, out success);
          if (!(success))
          {
-            MessageBox.Show("Search query contains errors.", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(@"Search query contains errors.", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
          }
 
          //Får inte innehålla några unknowns.
          if (nodes.Exists(x => x.NodeType == CodeSearchTree.NodeType.UnknownNode))
          {
-            MessageBox.Show("Search expression has an unknown node type.", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(@"Search expression has an unknown node type.", Text, MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
          }
 
-         System.IO.DirectoryInfo dir = null;
+         System.IO.DirectoryInfo dir;
          try
          {
             dir = new System.IO.DirectoryInfo(txtDirectory.Text);
             if (!(dir.Exists))
             {
-               MessageBox.Show("Directory does not exist.", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+               MessageBox.Show(@"Directory does not exist.", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
                return;
             }
          }
          catch
          {
-            MessageBox.Show("Invalid directory.", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(@"Invalid directory.", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
          }
 
          listView1.Items.Clear();
-         btnSearch.Text = "Stop";
+         btnSearch.Text = @"Stop";
          btnOK.Enabled = false;
-         this.InSearch = true;
-         this.Cursor = Cursors.WaitCursor;
-         var s = new Action<System.IO.DirectoryInfo, string, bool>(this.PerformSearch);
-         s.BeginInvoke(dir, txtSearch.Text, cboScope.SelectedIndex == 1, this.SearchDone, null);
+         InSearch = true;
+         Cursor = Cursors.WaitCursor;
+         var s = new Action<System.IO.DirectoryInfo, string, bool>(PerformSearch);
+         s.BeginInvoke(dir, txtSearch.Text, cboScope.SelectedIndex == 1, SearchDone, null);
       }
 
       //Utför sökningen. Lyssnar på cancel-flaggan för eventuellt avbrott.
-      private void PerformSearch(System.IO.DirectoryInfo dir, string search_expression, bool deep)
+      private void PerformSearch(System.IO.DirectoryInfo dir, string searchExpression, bool deep)
       {
          try
          {
-            this.FileList = new List<System.IO.FileInfo>();
-            this.SearchResult = new List<System.IO.FileInfo>();
+            FileList = new List<System.IO.FileInfo>();
+            SearchResult = new List<System.IO.FileInfo>();
 
             //Hämta C#-filerna i den angivna mappen.
-            dir.GetFiles("*.cs").ToList().ForEach(x => this.FileList.Add(x));
-            if (this.CancelFlag) this.StopSearch(true);
+            dir.GetFiles("*.cs").ToList().ForEach(x => FileList.Add(x));
+            if (CancelFlag)
+                StopSearch();
 
             //Hämta undermappar.
-            dir.GetDirectories().ToList().ForEach(x => this.PerformSearchAddChildFilesAndFolders(x));
-            if (this.CancelFlag) this.StopSearch(true);
+            dir.GetDirectories().ToList().ForEach(PerformSearchAddChildFilesAndFolders);
+            if (CancelFlag)
+                StopSearch();
 
-            foreach (var file in this.FileList)
+            foreach (var file in FileList)
             {
                var tree = CodeSearchTree.Node.CreateTreeFromFile(file.FullName);
                if (deep)
                {
-                  if (tree.DeepSearch(search_expression).Count > 0)
-                     this.SearchResult.Add(file);
+                  if (tree.DeepSearch(searchExpression).Count > 0)
+                     SearchResult.Add(file);
                }
                else
                {
-                  if (!(tree.GetChild(search_expression) == null))
-                     this.SearchResult.Add(file);
+                  if (tree.GetChild(searchExpression) != null)
+                     SearchResult.Add(file);
                }
             }
          }
          catch
          {
-            if (this.InvokeRequired)
-               this.Invoke(new Action(this.FailSearchGui));
+            if (InvokeRequired)
+               Invoke(new Action(FailSearchGui));
             else
-               this.FailSearchGui();
+               FailSearchGui();
          }
       }
 
       //Söker i childkataloger efter C#-filer. Anropas från PerformSearch i söktråden.
       private void PerformSearchAddChildFilesAndFolders(System.IO.DirectoryInfo parent)
       {
-         parent.GetFiles("*.cs").ToList().ForEach(x => this.FileList.Add(x));
-         if (this.CancelFlag) return;
-         parent.GetDirectories().ToList().ForEach(x => this.PerformSearchAddChildFilesAndFolders(x));
-         if (this.CancelFlag) this.StopSearch(true);
+         parent.GetFiles("*.cs").ToList().ForEach(x => FileList.Add(x));
+         if (CancelFlag)
+            return;
+         parent.GetDirectories().ToList().ForEach(PerformSearchAddChildFilesAndFolders);
+         if (CancelFlag)
+            StopSearch();
       }
 
       //Callback för avslutad sökning. Anropar StopSearchGui för att återställa GUI och PresentSearchResult för att presentera resultatet.
       private void SearchDone(object arg)
       {
-         this.InSearch = false;
-         if (this.InvokeRequired)
-            this.Invoke(new Action(this.StopSearchGui));
+         InSearch = false;
+         if (InvokeRequired)
+            Invoke(new Action(StopSearchGui));
          else
-            this.StopSearchGui();
-         if (this.InvokeRequired)
-            this.Invoke(new Action(this.PresentSearchResult));
+            StopSearchGui();
+         if (InvokeRequired)
+            Invoke(new Action(PresentSearchResult));
          else
-            this.PresentSearchResult();
+            PresentSearchResult();
       }
 
       //Anropas för att avbryta sökning.
-      private void StopSearch(bool cancel)
+      private void StopSearch()
       {
-         this.InSearch = false;
-         if (this.InvokeRequired)
-            this.Invoke(new Action(this.StopSearchGui));
+         InSearch = false;
+         if (InvokeRequired)
+            Invoke(new Action(StopSearchGui));
          else
-            this.StopSearchGui();
+            StopSearchGui();
       }
 
       //GUI-förändringar vid avslutad sökning.
       private void StopSearchGui()
       {
-         btnSearch.Text = "Search";
+         btnSearch.Text = @"Search";
          btnOK.Enabled = true;
-         this.Cursor = Cursors.Default;
+         Cursor = Cursors.Default;
       }
 
       //Lista sökresultatet och meddela användaren att vi är färdiga.
       private void PresentSearchResult()
       {
-         foreach (var f in this.SearchResult)
+         foreach (var f in SearchResult)
          {
-            var short_filename = CompactPath(f.FullName, 70);
-            var item = listView1.Items.Add(short_filename);
+            var shortFilename = CompactPath(f.FullName, 70);
+            var item = listView1.Items.Add(shortFilename);
             item.Tag = f;
          }
       }
@@ -202,16 +201,16 @@ namespace CodeSearchTreeTest
       //Anropas i catch vid misslyckad sökning.
       private void FailSearchGui()
       {
-         btnSearch.Text = "Search";
+         btnSearch.Text = @"Search";
          btnOK.Enabled = true;
-         this.Cursor = Cursors.Default;
-         MessageBox.Show("Search failed.", this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+         Cursor = Cursors.Default;
+         MessageBox.Show(@"Search failed.", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
 
       private void FindFileDialog_Load(object sender, EventArgs e)
       {
-         this.InSearch = false;
-         this.CancelFlag = false;
+         InSearch = false;
+         CancelFlag = false;
          txtDirectory.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
          cboScope.Items.Clear();
          cboScope.Items.Add("Search from root only");
@@ -219,15 +218,12 @@ namespace CodeSearchTreeTest
          cboScope.SelectedIndex = 0;
       }
 
-      private void txtSearch_TextChanged(object sender, EventArgs e)
-      {
-         btnSearch.Enabled = this.InSearch || !(string.IsNullOrWhiteSpace(txtSearch.Text));
-      }
+      private void txtSearch_TextChanged(object sender, EventArgs e) => btnSearch.Enabled = InSearch || !(string.IsNullOrWhiteSpace(txtSearch.Text));
 
-      private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
       {
-         if (!(listView1.GetItemAt(e.X, e.Y) == null))
-            this.btnOK_Click(sender, new EventArgs());
+         if (listView1.GetItemAt(e.X, e.Y) != null)
+            btnOK_Click(sender, new EventArgs());
       }
    }
 }
