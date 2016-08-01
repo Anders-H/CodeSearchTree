@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using CodeSearchTree;
+﻿using CodeSearchTree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
@@ -16,14 +14,10 @@ namespace UnitTests
             Assert.IsTrue(tree.UsingDirective.SearchResult.Source == "using System;", "Find using, no indexer.");
             Assert.IsTrue(tree.UsingDirective[0].Source == "using System;", "Find first using.");
             Assert.IsTrue(tree.UsingDirective[1].Source == "using System.Collections.Generic;", "Find second using.");
-            Assert.IsTrue(tree.Ns[0].Source.StartsWith("namespace Company.STA_PSPEC_AMT.BusinessLogic.Database"),
-                "Find namespace, indexer.");
-            Assert.IsTrue(
-                tree.Ns.SearchResult.Source.StartsWith("namespace TS.GUNNAR.BusinessLogic.Database {"),
-                "Find namespace, no indexer.");
+            Assert.IsTrue(tree.Ns[0].Source.StartsWith("namespace TS.GUNNAR.BusinessLogic.Database"), "Find namespace, indexer.");
+            Assert.IsTrue( tree.Ns.SearchResult.Source.StartsWith("namespace TS.GUNNAR.BusinessLogic.Database {"), "Find namespace, no indexer.");
             Assert.IsTrue(tree.Ns[0].Cls[0].Source.StartsWith("public sealed class A5560"), "Find class, indexers.");
-            Assert.IsTrue(tree.Ns.Cls.SearchResult.Source.StartsWith("public sealed class A5560"),
-                "Find class, no indexers.");
+            Assert.IsTrue(tree.Ns.Cls.SearchResult.Source.StartsWith("public sealed class A5560"), "Find class, no indexers.");
             Assert.IsTrue(
                 tree.Ns["Company.STA_PSPEC_AMT.BusinessLogic.Database"].Cls["A5560"].Source.StartsWith(
                     "public sealed class A5560"), "Find class by name.");

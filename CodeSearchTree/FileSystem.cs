@@ -51,7 +51,7 @@ namespace CodeSearchTree
             var ret = new List<FileInfo>();
             var parent = new DirectoryInfo(directoryName);
             if (!parent.Exists) return ret;
-            ret.AddRange(parent.GetFiles().Where(x => String.Compare(x.Extension, ".cs", StringComparison.OrdinalIgnoreCase) == 0));
+            ret.AddRange(parent.GetFiles().Where(x => string.Compare(x.Extension, ".cs", StringComparison.OrdinalIgnoreCase) == 0));
             if (includeChildDirectories && ret.Count < approximatelyMaximumResult)
                 parent.GetDirectories().ToList().ForEach(x => AddChildFiles(x, ret, approximatelyMaximumResult));
             return ret;
@@ -59,7 +59,7 @@ namespace CodeSearchTree
 
         private static void AddChildFiles(DirectoryInfo parent, List<FileInfo> result, int approximatelyMaximumResult)
         {
-            result.AddRange(parent.GetFiles().Where(x => String.Compare(x.Extension, ".cs", StringComparison.OrdinalIgnoreCase) == 0));
+            result.AddRange(parent.GetFiles().Where(x => string.Compare(x.Extension, ".cs", StringComparison.OrdinalIgnoreCase) == 0));
             if (result.Count < approximatelyMaximumResult)
                 parent.GetDirectories().ToList().ForEach(x => AddChildFiles(x, result, approximatelyMaximumResult));
         }

@@ -21,16 +21,13 @@
         internal Trivia() : this(TriviaTypes.UnknownTriviaSyntaxType, "")
         {
         }
-
         internal Trivia(TriviaTypes triviaTypes, string source)
         {
             TriviaType = triviaTypes;
             Source = source;
         }
-
         public TriviaTypes TriviaType { get; internal set; }
         public string Source { get; internal set; }
-
         public override string ToString() => $"{TriviaType}: {Source}";
     }
 }

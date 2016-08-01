@@ -115,12 +115,8 @@ namespace CodeSearchTree
         {
             var ret = new NodeList();
             ret.AddRange(this.Where(predicate));
-            foreach (var n in this)
-            {
-                var list = n.Children.GetNodes(predicate);
-                if (list.Count > 0)
-                    ret.AddRange(list);
-            }
+            foreach (var list in this.Select(n => n.Children.GetNodes(predicate)).Where(list => list.Count > 0))
+                ret.AddRange(list);
             return ret;
         }
 
@@ -159,12 +155,8 @@ namespace CodeSearchTree
         {
             var ret = new NodeList();
             ret.AddRange(this.Where(x => (type == NodeType.Any || x.NodeType == type) && predicate(x)));
-            foreach (var n in this)
-            {
-                var list = n.Children.GetNodesByType(type, predicate);
-                if (list.Count > 0)
-                    ret.AddRange(list);
-            }
+            foreach (var list in this.Select(n => n.Children.GetNodesByType(type, predicate)).Where(list => list.Count > 0))
+                ret.AddRange(list);
             return ret;
         }
 
@@ -263,7 +255,7 @@ namespace CodeSearchTree
             return ret;
         }
 
-        private void DeepSearchChild(SearchNode[] parsedSearchExpression, ref NodeList result, Node n)
+        private static void DeepSearchChild(SearchNode[] parsedSearchExpression, ref NodeList result, Node n)
         {
             result.AddRange(n.Children.Select(child => child.GetChild(parsedSearchExpression)).Where(childSvar => childSvar != null));
             foreach (var child in n.Children)
@@ -300,56 +292,60 @@ namespace CodeSearchTree
 
         internal static NodeList DoGetChildren(NodeType[] type, NodeList searchList)
         {
-            if (type.Length <= 0)
-                return new NodeList();
-            if (type.Length == 1)
-                return searchList.Filter(SearchNode.CreateSearchByType(type[0]));
-            if (type.Length == 2)
+            switch (type.Length)
             {
-                var ret = new NodeList();
-                var item = searchList.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
-                if (item == null)
-                    return ret;
-                ret.AddRange(item.Children.Filter(SearchNode.CreateSearchByType(type[1])));
-                return ret;
-            }
-            else
-            {
-                var item = searchList.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
-                for (var i = 1; i < type.Length - 1; i++)
-                {
-                    if (item == null)
-                        return new NodeList();
-                    item = item.Children.Filter(SearchNode.CreateSearchByType(type[i])).FirstOrDefault();
-                }
-
-                if (item == null)
+                case 0:
                     return new NodeList();
-                return item.Children.Filter(SearchNode.CreateSearchByType(type[type.Length - 1]));
+                case 1:
+                    return searchList.Filter(SearchNode.CreateSearchByType(type[0]));
+                case 2:
+                {
+                    var ret = new NodeList();
+                    var item = searchList.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
+                    if (item == null)
+                        return ret;
+                    ret.AddRange(item.Children.Filter(SearchNode.CreateSearchByType(type[1])));
+                    return ret;
+                }
+                default:
+                {
+                    var item = searchList.Filter(SearchNode.CreateSearchByType(type[0])).FirstOrDefault();
+                    for (var i = 1; i < type.Length - 1; i++)
+                    {
+                        if (item == null)
+                            return new NodeList();
+                        item = item.Children.Filter(SearchNode.CreateSearchByType(type[i])).FirstOrDefault();
+                    }
+
+                    return item == null ? new NodeList() : item.Children.Filter(SearchNode.CreateSearchByType(type[type.Length - 1]));
+                }
             }
         }
 
         internal static Node DoGetChild(NodeList searchList, params SearchNode[] sn)
         {
-            if (sn.Length == 0)
-                return null;
-            if (sn.Length == 1)
-                return searchList.Filter(sn[0]).FirstOrDefault();
-            if (sn.Length == 2)
+            switch (sn.Length)
             {
-                var item = searchList.Filter(sn[0]).FirstOrDefault();
-                return item?.Children.Filter(sn[1]).FirstOrDefault();
-            }
-            else
-            {
-                var item = searchList.Filter(sn[0]).FirstOrDefault();
-                for (int i = 1; i < (sn.Length - 1); i++)
+                case 0:
+                    return null;
+                case 1:
+                    return searchList.Filter(sn[0]).FirstOrDefault();
+                case 2:
                 {
-                    if (item == null)
-                        return null;
-                    item = item.Children.Filter(sn[i]).FirstOrDefault();
+                    var item = searchList.Filter(sn[0]).FirstOrDefault();
+                    return item?.Children.Filter(sn[1]).FirstOrDefault();
                 }
-                return item?.Children.Filter(sn[sn.Length - 1]).FirstOrDefault();
+                default:
+                {
+                    var item = searchList.Filter(sn[0]).FirstOrDefault();
+                    for (var i = 1; i < sn.Length - 1; i++)
+                    {
+                        if (item == null)
+                            return null;
+                        item = item.Children.Filter(sn[i]).FirstOrDefault();
+                    }
+                    return item?.Children.Filter(sn[sn.Length - 1]).FirstOrDefault();
+                }
             }
         }
     }
