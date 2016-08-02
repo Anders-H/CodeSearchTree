@@ -22,6 +22,7 @@
         TypedSearchNode New { get; }
         TypedSearchNode Ns { get; }
         TypedSearchNode Property { get; }
+        TypedSearchNode Try { get; }
         TypedSearchNode UsingDirective { get; }
         TypedSearchNode VarDeclaration { get; }
         TypedSearchNode VarDeclarator { get; }

@@ -41,6 +41,17 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void TypedSearchForReturnType()
+        {
+            // ns/cls/property[#AmtUserDbsFieldNumericOS2200] == Updnr
+            const string filename = @"C:\Jobb\TS-Compiler\Stordatorkod\Development\Development\Database\A5550.cs";
+            var tree = Node.CreateTreeFromFile(filename);
+            var result = tree.Ns.Cls.Property["#AmtUserDbsFieldNumericOS2200"];
+            Assert.IsNotNull(result, "Could not find node.");
+            Assert.IsTrue(result.Name == "Updnr", "Wrong node.");
+        }
+
+        [TestMethod]
         public void BugfixForTableEditorTest()
         {
             const string filename = @"C:\Jobb\TS-Compiler\Stordatorkod\Development\Development\Database\A5560.cs";

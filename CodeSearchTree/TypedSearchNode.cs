@@ -23,6 +23,7 @@
         public TypedSearchNode New => new TypedSearchNode(NodeType.ObjectCreationExpressionSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode Property => new TypedSearchNode(NodeType.PropertyDeclarationSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
+        public TypedSearchNode Try => new TypedSearchNode(NodeType.TryStatementSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode UsingDirective => new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode VarDeclaration => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
         public TypedSearchNode VarDeclarator => new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
@@ -37,6 +38,6 @@
 
         public Node this[int index] => OwnerNode?.GetChild(SearchNode.CreateSearchByTypeAndIndex(NodeTypeSearch, index));
 
-        public Node this[string name] => OwnerNode?.GetChild(SearchNode.CerateSearchByTypeAndName(NodeTypeSearch, name));
+        public Node this[string name] => OwnerNode?.GetChild(SearchNode.Create(NodeTypeSearch, name));
     }
 }

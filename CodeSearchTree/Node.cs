@@ -12,8 +12,12 @@ namespace CodeSearchTree
 {
     public class Node : ITypedSearch, ITypedChild, INode
     {
+        [Category("Meta")]
         public bool EntityIsNode => false;
+        [Category("Meta")]
         public bool EntityIsNodeList => true;
+        [Category("Meta")]
+        public bool HasChildren => ChildCount > 0;
 
         //Typed search.
         [Browsable(false)]
@@ -56,6 +60,8 @@ namespace CodeSearchTree
         public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
         [Browsable(false)]
         public TypedSearchNode Property => new TypedSearchNode(NodeType.PropertyDeclarationSyntaxNode, this);
+        [Browsable(false)]
+        public TypedSearchNode Try => new TypedSearchNode(NodeType.TryStatementSyntaxNode, this);
         [Browsable(false)]
         public TypedSearchNode UsingDirective => new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, this);
         [Browsable(false)]
@@ -103,8 +109,7 @@ namespace CodeSearchTree
         public OperatorType OperatorType { get; private set; } = OperatorType.None;
         public object RoslynNode { get; }
 
-        protected internal Node(object roslynNode, string source)
-            : this(roslynNode, source, null, NodeType.NamespaceDeclarationSyntaxNode)
+        protected internal Node(object roslynNode, string source) : this(roslynNode, source, null, NodeType.NamespaceDeclarationSyntaxNode)
         {
         }
 

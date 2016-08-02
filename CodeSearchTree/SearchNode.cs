@@ -1,4 +1,6 @@
-﻿namespace CodeSearchTree
+﻿using System.Globalization;
+
+namespace CodeSearchTree
 {
     public class SearchNode
     {
@@ -9,6 +11,20 @@
             Name = name;
             ReturnType = returnType;
             AttributeName = attributeName;
+        }
+
+        public static SearchNode Create(NodeType nodeType, string expression)
+        {
+            int parseTest;
+            if (string.IsNullOrEmpty(expression))
+                return CreateSearchByType(nodeType);
+            if (expression.StartsWith("@"))
+                return CerateSearchByTypeAndAttribute(nodeType, expression.Substring(1));
+            if (expression.StartsWith("#"))
+                return CerateSearchByTypeAndReturnType(nodeType, expression.Substring(1));
+            if (int.TryParse(expression, NumberStyles.Any, CultureInfo.InvariantCulture, out parseTest))
+                return CreateSearchByTypeAndIndex(nodeType, parseTest);
+            return CerateSearchByTypeAndName(nodeType, expression);
         }
 
         public static SearchNode CreateSearchByType(NodeType nodeType)
