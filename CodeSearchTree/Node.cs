@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace CodeSearchTree
 {
@@ -69,73 +68,52 @@ namespace CodeSearchTree
         [Browsable(false)]
         public TypedSearchNode VarDeclaration => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
         //End typed search.
-
         [Category("Meta"), Description("Enumeration of Roslyn types.")]
         public NodeType NodeType { get; internal set; }
-
         [Category("Relatives"), Description("List of child nodes.")]
         public NodeList Children { get; } = new NodeList();
-
         [Category("Main"), Description("Return type name")]
         public string ReturnTypeName { get; internal set; } = "";
-
         [Category("Main"), Description("Original source code.")]
         public string Source { get; internal set; }
-
         [Category("Main"), Description("Start character position.")]
         public int StartPosition { get; internal set; }
-
         [Category("Main"), Description("End character position.")]
         public int EndPosition { get; internal set; }
-
         [Category("Meta"), Description("List of leading trivia.")]
         public TriviaList LeadingTrivia { get; } = new TriviaList();
-
         [Category("Meta"), Description("List of trailing trivia.")]
         public TriviaList TrailingTrivia { get; } = new TriviaList();
-
         [Category("Meta"), Description("Name or identifier of node.")]
         public string Name { get; private set; }
-
         [Category("Relatives"), Description("Reference to parent node, if available.")]
         public Node Parent { get; }
-
         internal NodeList ParentListIfNoParent { get; set; }
-
         [Category("Meta"), Description("List of attributes.")]
         public List<string> Attributes { get; } = new List<string>();
-
         public string Operator { get; private set; } = "";
         public OperatorType OperatorType { get; private set; } = OperatorType.None;
         public object RoslynNode { get; }
-
         protected internal Node(object roslynNode, string source) : this(roslynNode, source, null, NodeType.NamespaceDeclarationSyntaxNode)
         {
         }
-
         protected internal Node(object roslynNode, string source, Node parent, NodeType nodeType)
         {
             RoslynNode = roslynNode;
-            Debug.Assert(roslynNode != null, "roslynNode != null");
             StartPosition = ((SyntaxNode) roslynNode).FullSpan.Start;
             EndPosition = ((SyntaxNode) roslynNode).FullSpan.End;
             NodeType = nodeType;
             Parent = parent;
             Source = source;
         }
-
         [Category("Main"), Description("Original source length in characters.")]
         public int Length => Source.Length;
-
         [Category("Relatives"), Description("Number of child nodes.")]
         public int ChildCount => Children.Count;
-
         [Category("Relatives"), Description("Type of parant node, if available.")]
         public NodeType ParentType => Parent?.NodeType ?? NodeType.UnknownNode;
-
         [Category("Meta"), Description("String representation of node type.")]
         public string NodeTypeString => SearchExpressionParser.NodeTypeToKeyword(NodeType);
-
         [Category("Meta"), Description("Strign representing list of attributes.")]
         public string AttributesString
         {
@@ -148,7 +126,6 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
-
         [Category("Meta"), Description("String representation of leading trivia.")]
         public string LeadingTriviaString
         {
@@ -159,7 +136,6 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
-
         [Category("Meta"), Description("String representation of trailing trivia.")]
         public string TrailingTriviaString
         {
@@ -170,7 +146,6 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
-
         [Category("Roslyn"), Description("Properties of the underlying Roslyn SyntaxNode.")]
         public List<Property> RoslynNodeProperties
         {
@@ -185,7 +160,6 @@ namespace CodeSearchTree
                 return ret;
             }
         }
-
         [Category("Roslyn"), Description("String representation of the properties of the underlying Roslyn SyntaxNode.")]
         public string RoslynNodePropertiesString
         {
@@ -196,7 +170,6 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
-
         /// <summary>
         /// Creates a parsed C# tree from a given .cs file.
         /// </summary>
@@ -209,7 +182,6 @@ namespace CodeSearchTree
                 code = sr.ReadToEnd();
             return CreateTreeFromCode(code);
         }
-
         /// <summary>
         /// Creates a parsed C# tree from a string of C# code.
         /// </summary>
@@ -234,7 +206,6 @@ namespace CodeSearchTree
             ret.ForEach(x => x.CheckAttributes());
             return ret;
         }
-
         /// <summary>
         ///     Checks if this node confirms to a search node.
         /// </summary>
@@ -261,7 +232,6 @@ namespace CodeSearchTree
                 && string.IsNullOrEmpty(n.Name)
                 && string.IsNullOrEmpty(n.ReturnType);
         }
-
         /// <summary>
         /// Calculates the index of this node in it's containing collection, when the collection is filtered on the same node type as this node.
         /// </summary>
@@ -274,19 +244,10 @@ namespace CodeSearchTree
                 return subset.IndexOf(this);
             }
         }
-
         /// <summary>
         /// Calculates the index of this node in it's containing collection.
         /// </summary>
-        public int ActualIndex
-        {
-            get
-            {
-                var parent = Parent == null ? ParentListIfNoParent : Parent.Children;
-                return parent.IndexOf(this);
-            }
-        }
-
+        public int ActualIndex => (Parent == null ? ParentListIfNoParent : Parent.Children).IndexOf(this);
         internal void CheckName()
         {
             var n = RoslynNode as SyntaxNode;
@@ -359,7 +320,6 @@ namespace CodeSearchTree
             foreach (var child in Children)
                 child.CheckName();
         }
-
         internal void CheckReturnType()
         {
             var n = RoslynNode as SyntaxNode;
@@ -375,7 +335,6 @@ namespace CodeSearchTree
             foreach (var child in Children)
                 child.CheckReturnType();
         }
-
         internal void CheckAttributes()
         {
             //Checking for attributes only on classes, methods and properties.
@@ -411,7 +370,6 @@ namespace CodeSearchTree
                 CreateChildren(codeNode, n);
             }
         }
-
         /// <summary>
         /// Search expression that allocates this node from root.
         /// </summary>
@@ -459,7 +417,6 @@ namespace CodeSearchTree
                 return ret;
             }
         }
-
         /// <summary>
         /// Same as FullPath but with name guards where possible.
         /// </summary>
@@ -517,7 +474,6 @@ namespace CodeSearchTree
                 return ret;
             }
         }
-
         internal static NodeType GetNodeType(SyntaxNode n)
         {
             if (n is UsingDirectiveSyntax)
@@ -738,35 +694,30 @@ namespace CodeSearchTree
                     node.TrailingTrivia.Add(new Trivia(GetTriviaType(t), s));
             }
         }
-
         /// <summary>
         /// Returns all child nodes of the given nodetypes.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
         public NodeList GetChildren(NodeType[] type) => NodeList.DoGetChildren(type, Children);
-
         /// <summary>
         /// Returns the first child node of any of the given types.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
         public Node GetChild(params NodeType[] type) => GetChildren(type).FirstOrDefault();
-
         /// <summary>
         /// Returns the first child node that matches the given search expression.
         /// </summary>
         /// <param name="searchExpression"></param>
         /// <returns></returns>
         public Node GetChild(string searchExpression) => GetChild(new SearchExpressionParser(searchExpression).Parse().ToArray());
-
         /// <summary>
         /// Returns the first child node that matches the given search expression.
         /// </summary>
         /// <param name="sn"></param>
         /// <returns></returns>
         public Node GetChild(params SearchNode[] sn) => NodeList.DoGetChild(Children, sn);
-
         public static SearchNodeList ParseSearchExpression(string searchExpression, out bool success)
         {
             success = true;
@@ -784,18 +735,11 @@ namespace CodeSearchTree
          }
 #endif
         }
-
-        public static SearchNodeList ParseSearchExpression(string searchExpression) =>
-            new SearchExpressionParser(searchExpression).Parse();
-
+        public static SearchNodeList ParseSearchExpression(string searchExpression) => new SearchExpressionParser(searchExpression).Parse();
         public Node GetNextSibling() => Parent?.Children.GetNextSibling(this);
-
         public Node GetPreviousSibling() => Parent?.Children.GetPreviousSibling(this);
-
         public Node GetFirstSibling() => Parent?.Children.FirstOrDefault();
-
         public Node GetLastSibling() => Parent?.Children.LastOrDefault();
-
         private static Trivia.TriviaTypes GetTriviaType(SyntaxTrivia t)
         {
             switch (t.Kind())
@@ -1732,12 +1676,12 @@ namespace CodeSearchTree
                     break;
                 case SyntaxKind.LoadDirectiveTrivia:
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
             return Trivia.TriviaTypes.UnknownTriviaSyntaxType;
         }
-
         public override string ToString() => string.IsNullOrEmpty(Name) ? NodeType.ToString() : $"{NodeType}[{Name}]";
-
         /// <summary>
         /// Returns all siblings of the same type.
         /// </summary>

@@ -12,7 +12,6 @@ namespace CodeSearchTree
             ReturnType = returnType;
             AttributeName = attributeName;
         }
-
         public static SearchNode Create(NodeType nodeType, string expression)
         {
             int parseTest;
@@ -26,22 +25,11 @@ namespace CodeSearchTree
                 return CreateSearchByTypeAndIndex(nodeType, parseTest);
             return CerateSearchByTypeAndName(nodeType, expression);
         }
-
-        public static SearchNode CreateSearchByType(NodeType nodeType)
-            => new SearchNode(nodeType, -1, "", "", "");
-
-        public static SearchNode CreateSearchByTypeAndIndex(NodeType nodeType, int index)
-            => new SearchNode(nodeType, index, "", "", "");
-
-        public static SearchNode CerateSearchByTypeAndAttribute(NodeType nodeType, string attributeName)
-            => new SearchNode(nodeType, -1, "", "", attributeName);
-
-        public static SearchNode CerateSearchByTypeAndReturnType(NodeType nodeType, string returnType)
-            => new SearchNode(nodeType, -1, "", returnType, "");
-
-        public static SearchNode CerateSearchByTypeAndName(NodeType nodeType, string name)
-            => new SearchNode(nodeType, -1, name, "", "");
-
+        public static SearchNode CreateSearchByType(NodeType nodeType) => new SearchNode(nodeType, -1, "", "", "");
+        public static SearchNode CreateSearchByTypeAndIndex(NodeType nodeType, int index) => new SearchNode(nodeType, index, "", "", "");
+        public static SearchNode CerateSearchByTypeAndAttribute(NodeType nodeType, string attributeName) => new SearchNode(nodeType, -1, "", "", attributeName);
+        public static SearchNode CerateSearchByTypeAndReturnType(NodeType nodeType, string returnType) => new SearchNode(nodeType, -1, "", returnType, "");
+        public static SearchNode CerateSearchByTypeAndName(NodeType nodeType, string name) => new SearchNode(nodeType, -1, name, "", "");
         public string AttributeName { get; private set; }
         public string ReturnType { get; private set; }
         public NodeType NodeType { get; private set; }

@@ -20,6 +20,13 @@ namespace CodeSearchTreeTest
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
+
+
+
+
+
+
             cboSearchFrom.Items.AddRange(new object[] { "Root", "Selected node", "Deep (from root)" });
             cboSearchFrom.SelectedIndex = 0;
 

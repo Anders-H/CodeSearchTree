@@ -15,7 +15,6 @@ namespace CodeSearchTree
         public bool EntityIsNodeList => true;
         [Category("Meta")]
         public bool HasChildren => Count > 0;
-
         //Typed search.
         [Browsable(false)]
         public TypedSearchNode Arg => new TypedSearchNode(NodeType.ArgumentSyntaxNode, this);

@@ -9,9 +9,7 @@ namespace CodeSearchTree
         {
             Source = source?.Trim() ?? "";
         }
-
         private string Source { get; }
-
         public SearchNodeList Parse()
         {
             var ret = new SearchNodeList();
@@ -61,7 +59,6 @@ namespace CodeSearchTree
             }
             return ret;
         }
-
         private static NodeType KeywordToEnum(string keyword)
         {
             switch (keyword) //Ändra här om enumen i filen Node.cs ändras.
@@ -347,7 +344,6 @@ namespace CodeSearchTree
                     return NodeType.UnknownNode;
             }
         }
-
         internal static string NodeTypeToKeyword(NodeType n)
         {
             switch (n)

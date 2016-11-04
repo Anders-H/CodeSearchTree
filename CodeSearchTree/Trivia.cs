@@ -17,7 +17,6 @@
             LineDirectiveTriviaType,
             EndIfDirectiveTriviaType
         }
-
         internal Trivia() : this(TriviaTypes.UnknownTriviaSyntaxType, "")
         {
         }

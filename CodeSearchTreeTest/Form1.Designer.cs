@@ -83,7 +83,7 @@
             this.treeView1.HideSelection = false;
             this.treeView1.Location = new System.Drawing.Point(0, 13);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(371, 500);
+            this.treeView1.Size = new System.Drawing.Size(371, 396);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.treeView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeView1_DragDrop);
@@ -99,7 +99,7 @@
             this.txtResult.Name = "txtResult";
             this.txtResult.ReadOnly = true;
             this.txtResult.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtResult.Size = new System.Drawing.Size(539, 500);
+            this.txtResult.Size = new System.Drawing.Size(539, 396);
             this.txtResult.TabIndex = 0;
             this.txtResult.WordWrap = false;
             // 
@@ -118,8 +118,8 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.txtInput);
             this.splitContainer1.Panel2.Controls.Add(this.label1);
-            this.splitContainer1.Size = new System.Drawing.Size(1416, 627);
-            this.splitContainer1.SplitterDistance = 513;
+            this.splitContainer1.Size = new System.Drawing.Size(1416, 501);
+            this.splitContainer1.SplitterDistance = 409;
             this.splitContainer1.SplitterWidth = 5;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -137,7 +137,7 @@
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer3);
-            this.splitContainer2.Size = new System.Drawing.Size(1416, 513);
+            this.splitContainer2.Size = new System.Drawing.Size(1416, 409);
             this.splitContainer2.SplitterDistance = 371;
             this.splitContainer2.SplitterWidth = 5;
             this.splitContainer2.TabIndex = 1;
@@ -167,7 +167,7 @@
             // 
             this.splitContainer3.Panel2.Controls.Add(this.propertyGrid1);
             this.splitContainer3.Panel2.Controls.Add(this.label4);
-            this.splitContainer3.Size = new System.Drawing.Size(1040, 513);
+            this.splitContainer3.Size = new System.Drawing.Size(1040, 409);
             this.splitContainer3.SplitterDistance = 539;
             this.splitContainer3.SplitterWidth = 5;
             this.splitContainer3.TabIndex = 2;
@@ -188,7 +188,7 @@
             this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 13);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(496, 500);
+            this.propertyGrid1.Size = new System.Drawing.Size(496, 396);
             this.propertyGrid1.TabIndex = 0;
             // 
             // label4
@@ -211,7 +211,7 @@
             this.txtInput.Location = new System.Drawing.Point(0, 13);
             this.txtInput.Multiline = true;
             this.txtInput.Name = "txtInput";
-            this.txtInput.Size = new System.Drawing.Size(1416, 96);
+            this.txtInput.Size = new System.Drawing.Size(1416, 74);
             this.txtInput.TabIndex = 0;
             this.txtInput.WordWrap = false;
             this.txtInput.Entered += new System.Action<object, CodeSearchTreeTest.TextEnteredEventArgs>(this.txtInput_Entered);
@@ -298,18 +298,19 @@
             // 
             // contextMenuStrip1
             // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.viewSourceToolStripMenuItem,
             this.viewRoslynToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(138, 48);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(154, 80);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
             // 
             // viewSourceToolStripMenuItem
             // 
             this.viewSourceToolStripMenuItem.Image = global::CodeSearchTreeTest.Properties.Resources.XSDSchema_NameSpaceIcon;
             this.viewSourceToolStripMenuItem.Name = "viewSourceToolStripMenuItem";
-            this.viewSourceToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.viewSourceToolStripMenuItem.Size = new System.Drawing.Size(153, 38);
             this.viewSourceToolStripMenuItem.Text = "View source";
             this.viewSourceToolStripMenuItem.Click += new System.EventHandler(this.viewSourceToolStripMenuItem_Click);
             // 
@@ -317,7 +318,7 @@
             // 
             this.viewRoslynToolStripMenuItem.Image = global::CodeSearchTreeTest.Properties.Resources.EditCodeHS;
             this.viewRoslynToolStripMenuItem.Name = "viewRoslynToolStripMenuItem";
-            this.viewRoslynToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.viewRoslynToolStripMenuItem.Size = new System.Drawing.Size(153, 38);
             this.viewRoslynToolStripMenuItem.Text = "View Roslyn";
             this.viewRoslynToolStripMenuItem.Click += new System.EventHandler(this.viewRoslynToolStripMenuItem_Click);
             // 
@@ -326,7 +327,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ddProperty,
             this.lblProperty});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 652);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 526);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1416, 22);
             this.statusStrip1.TabIndex = 2;
@@ -375,7 +376,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1416, 674);
+            this.ClientSize = new System.Drawing.Size(1416, 548);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.toolStrip1);

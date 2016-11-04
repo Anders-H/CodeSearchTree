@@ -1,4 +1,5 @@
-﻿using CodeSearchTree;
+﻿using System;
+using CodeSearchTree;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests
