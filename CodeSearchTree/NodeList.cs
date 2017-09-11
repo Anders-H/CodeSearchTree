@@ -321,7 +321,6 @@ namespace CodeSearchTree
                             return new NodeList();
                         item = item.Children.Filter(SearchNode.CreateSearchByType(type[i])).FirstOrDefault();
                     }
-
                     return item == null ? new NodeList() : item.Children.Filter(SearchNode.CreateSearchByType(type[type.Length - 1]));
                 }
             }
