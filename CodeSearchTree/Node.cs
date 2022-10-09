@@ -24,101 +24,177 @@ namespace CodeSearchTree
             ChildCount > 0;
 
         //Typed search.
+        
         [Browsable(false)]
-        public TypedSearchNode Arg => new TypedSearchNode(NodeType.ArgumentSyntaxNode, this);
+        public TypedSearchNode Arg =>
+            new TypedSearchNode(NodeType.ArgumentSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode ArgList => new TypedSearchNode(NodeType.ArgumentListSyntaxNode, this);
+        public TypedSearchNode ArgList =>
+            new TypedSearchNode(NodeType.ArgumentListSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Assign => new TypedSearchNode(NodeType.AssignmentExpressionSyntaxNode, this);
+        public TypedSearchNode Assign =>
+            new TypedSearchNode(NodeType.AssignmentExpressionSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode BaseList => new TypedSearchNode(NodeType.BaseListSyntaxNode, this);
+        public TypedSearchNode BaseList =>
+            new TypedSearchNode(NodeType.BaseListSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode BaseType => new TypedSearchNode(NodeType.SimpleBaseTypeSyntaxNode, this);
+        public TypedSearchNode BaseType =>
+            new TypedSearchNode(NodeType.SimpleBaseTypeSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Block => new TypedSearchNode(NodeType.BlockSyntaxNode, this);
+        public TypedSearchNode Block =>
+            new TypedSearchNode(NodeType.BlockSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Cls => new TypedSearchNode(NodeType.ClassDeclarationSyntaxNode, this);
+        public TypedSearchNode Cls =>
+            new TypedSearchNode(NodeType.ClassDeclarationSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Constructor => new TypedSearchNode(NodeType.ConstructorDeclarationSyntaxNode, this);
+        public TypedSearchNode Constructor =>
+            new TypedSearchNode(NodeType.ConstructorDeclarationSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode EqualsValue => new TypedSearchNode(NodeType.EqualsValueClauseSyntaxNode, this);
+        public TypedSearchNode EqualsValue =>
+            new TypedSearchNode(NodeType.EqualsValueClauseSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Expression => new TypedSearchNode(NodeType.ExpressionStatementSyntaxNode, this);
+        public TypedSearchNode Expression =>
+            new TypedSearchNode(NodeType.ExpressionStatementSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Field => new TypedSearchNode(NodeType.FieldDeclarationSyntaxNode, this);
+        public TypedSearchNode Field =>
+            new TypedSearchNode(NodeType.FieldDeclarationSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Id => new TypedSearchNode(NodeType.IdentifierNameSyntaxNode, this);
+        public TypedSearchNode Id =>
+            new TypedSearchNode(NodeType.IdentifierNameSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode If => new TypedSearchNode(NodeType.IfStatementSyntaxNode, this);
+        public TypedSearchNode If =>
+            new TypedSearchNode(NodeType.IfStatementSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Invocation => new TypedSearchNode(NodeType.InvocationExpressionSyntaxNode, this);
+        public TypedSearchNode Invocation =>
+            new TypedSearchNode(NodeType.InvocationExpressionSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Literal => new TypedSearchNode(NodeType.LiteralExpressionSyntaxNode, this);
+        public TypedSearchNode Literal =>
+            new TypedSearchNode(NodeType.LiteralExpressionSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode MemberAccess => new TypedSearchNode(NodeType.MemberAccessExpressionSyntaxNode, this);
+        public TypedSearchNode MemberAccess =>
+            new TypedSearchNode(NodeType.MemberAccessExpressionSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Method => new TypedSearchNode(NodeType.MethodDeclarationSyntaxNode, this);
+        public TypedSearchNode Method =>
+            new TypedSearchNode(NodeType.MethodDeclarationSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode New => new TypedSearchNode(NodeType.ObjectCreationExpressionSyntaxNode, this);
+        public TypedSearchNode New =>
+            new TypedSearchNode(NodeType.ObjectCreationExpressionSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Ns => new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
+        public TypedSearchNode Ns =>
+            new TypedSearchNode(NodeType.NamespaceDeclarationSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Property => new TypedSearchNode(NodeType.PropertyDeclarationSyntaxNode, this);
+        public TypedSearchNode Property =>
+            new TypedSearchNode(NodeType.PropertyDeclarationSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode Try => new TypedSearchNode(NodeType.TryStatementSyntaxNode, this);
+        public TypedSearchNode Try =>
+            new TypedSearchNode(NodeType.TryStatementSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode UsingDirective => new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, this);
+        public TypedSearchNode UsingDirective =>
+            new TypedSearchNode(NodeType.UsingDirectiveSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode VarDeclarator => new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, this);
+        public TypedSearchNode VarDeclarator =>
+            new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, this);
+        
         [Browsable(false)]
-        public TypedSearchNode VarDeclaration => new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
+        public TypedSearchNode VarDeclaration =>
+            new TypedSearchNode(NodeType.VariableDeclarationSyntaxNode, this);
+        
         //End typed search.
+        
         [Category("Meta"), Description("Enumeration of Roslyn types.")]
         public NodeType NodeType { get; internal set; }
+        
         [Category("Relatives"), Description("List of child nodes.")]
         public NodeList Children { get; } = new NodeList();
+        
         [Category("Main"), Description("Return type name")]
         public string ReturnTypeName { get; internal set; } = "";
+        
         [Category("Main"), Description("Original source code.")]
         public string Source { get; internal set; }
+        
         [Category("Main"), Description("Start character position.")]
+        
         public int StartPosition { get; internal set; }
+        
         [Category("Main"), Description("End character position.")]
         public int EndPosition { get; internal set; }
+        
         [Category("Meta"), Description("List of leading trivia.")]
         public TriviaList LeadingTrivia { get; } = new TriviaList();
+        
         [Category("Meta"), Description("List of trailing trivia.")]
         public TriviaList TrailingTrivia { get; } = new TriviaList();
+        
         [Category("Meta"), Description("Name or identifier of node.")]
         public string Name { get; private set; }
+        
         [Category("Relatives"), Description("Reference to parent node, if available.")]
         public Node Parent { get; }
+        
         internal NodeList ParentListIfNoParent { get; set; }
+        
         [Category("Meta"), Description("List of attributes.")]
         public List<string> Attributes { get; } = new List<string>();
+        
         public string Operator { get; private set; } = "";
+        
         public OperatorType OperatorType { get; private set; } = OperatorType.None;
+        
         public object RoslynNode { get; }
+
         protected internal Node(object roslynNode, string source) : this(roslynNode, source, null, NodeType.NamespaceDeclarationSyntaxNode)
         {
         }
+        
         protected internal Node(object roslynNode, string source, Node parent, NodeType nodeType)
         {
             RoslynNode = roslynNode;
-            StartPosition = ((SyntaxNode) roslynNode).FullSpan.Start;
-            EndPosition = ((SyntaxNode) roslynNode).FullSpan.End;
+            StartPosition = ((SyntaxNode)roslynNode).FullSpan.Start;
+            EndPosition = ((SyntaxNode)roslynNode).FullSpan.End;
             NodeType = nodeType;
             Parent = parent;
             Source = source;
         }
+        
         [Category("Main"), Description("Original source length in characters.")]
-        public int Length => Source.Length;
+        public int Length =>
+            Source.Length;
+        
         [Category("Relatives"), Description("Number of child nodes.")]
-        public int ChildCount => Children.Count;
+        public int ChildCount =>
+            Children.Count;
+        
         [Category("Relatives"), Description("Type of parant node, if available.")]
-        public NodeType ParentType => Parent?.NodeType ?? NodeType.UnknownNode;
+        public NodeType ParentType =>
+            Parent?.NodeType ?? NodeType.UnknownNode;
+        
         [Category("Meta"), Description("String representation of node type.")]
-        public string NodeTypeString => SearchExpressionParser.NodeTypeToKeyword(NodeType);
+        public string NodeTypeString =>
+            SearchExpressionParser.NodeTypeToKeyword(NodeType);
+        
         [Category("Meta"), Description("Strign representing list of attributes.")]
         public string AttributesString
         {
@@ -131,6 +207,7 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
+        
         [Category("Meta"), Description("String representation of leading trivia.")]
         public string LeadingTriviaString
         {
@@ -141,6 +218,7 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
+        
         [Category("Meta"), Description("String representation of trailing trivia.")]
         public string TrailingTriviaString
         {
@@ -151,6 +229,7 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
+        
         [Category("Roslyn"), Description("Properties of the underlying Roslyn SyntaxNode.")]
         public List<Property> RoslynNodeProperties
         {
@@ -165,6 +244,7 @@ namespace CodeSearchTree
                 return ret;
             }
         }
+        
         [Category("Roslyn"), Description("String representation of the properties of the underlying Roslyn SyntaxNode.")]
         public string RoslynNodePropertiesString
         {
@@ -175,6 +255,7 @@ namespace CodeSearchTree
                 return s.ToString();
             }
         }
+        
         /// <summary>
         /// Creates a parsed C# tree from a given .cs file.
         /// </summary>
@@ -187,6 +268,7 @@ namespace CodeSearchTree
                 code = sr.ReadToEnd();
             return CreateTreeFromCode(code);
         }
+        
         /// <summary>
         /// Creates a parsed C# tree from a string of C# code.
         /// </summary>
@@ -211,6 +293,7 @@ namespace CodeSearchTree
             ret.ForEach(x => x.CheckAttributes());
             return ret;
         }
+
         /// <summary>
         ///     Checks if this node confirms to a search node.
         /// </summary>
@@ -220,23 +303,30 @@ namespace CodeSearchTree
         {
             if (n.NodeType != NodeType && n.NodeType != NodeType.Any)
                 return false;
+
             //Check for index.
             if (n.Index >= 0 && TypeFilteredIndex == n.Index)
                 return true;
+            
             if (n.Index >= 0)
                 return false;
+            
             //Check for attribute name.
             if (!(string.IsNullOrEmpty(n.AttributeName)) && Attributes.Contains(n.AttributeName))
                 return true;
+            
             if (!(string.IsNullOrEmpty(n.Name)) && string.CompareOrdinal(Name, n.Name) == 0)
                 return true;
+            
             if (!(string.IsNullOrEmpty(n.ReturnType)) && string.CompareOrdinal(ReturnTypeName, n.ReturnType) == 0)
                 return true;
+            
             return n.Index < 0
                 && string.IsNullOrEmpty(n.AttributeName)
                 && string.IsNullOrEmpty(n.Name)
                 && string.IsNullOrEmpty(n.ReturnType);
         }
+
         /// <summary>
         /// Calculates the index of this node in it's containing collection, when the collection is filtered on the same node type as this node.
         /// </summary>
@@ -249,14 +339,16 @@ namespace CodeSearchTree
                 return subset.IndexOf(this);
             }
         }
+
         /// <summary>
         /// Calculates the index of this node in it's containing collection.
         /// </summary>
-        public int ActualIndex => (Parent == null ? ParentListIfNoParent : Parent.Children).IndexOf(this);
+        public int ActualIndex =>
+            (Parent == null ? ParentListIfNoParent : Parent.Children).IndexOf(this);
+        
         internal void CheckName()
         {
-            var n = RoslynNode as SyntaxNode;
-            if (n != null)
+            if (RoslynNode is SyntaxNode n)
             {
                 if (n is ClassDeclarationSyntax)
                     Name = (n as ClassDeclarationSyntax).Identifier.ToString();
@@ -325,21 +417,23 @@ namespace CodeSearchTree
             foreach (var child in Children)
                 child.CheckName();
         }
+
         internal void CheckReturnType()
         {
-            var n = RoslynNode as SyntaxNode;
-            if (n != null)
+            if (RoslynNode is SyntaxNode n)
             {
-                if (n is GenericNameSyntax)
-                    Parent.ReturnTypeName = (n as GenericNameSyntax).ToString();
-                else if (n is PredefinedTypeSyntax)
-                    Parent.ReturnTypeName = (n as PredefinedTypeSyntax).ToString();
-                else if (n is IdentifierNameSyntax)
-                    Parent.ReturnTypeName = (n as IdentifierNameSyntax).ToString();
+                if (n is GenericNameSyntax syntax)
+                    Parent.ReturnTypeName = syntax.ToString();
+                else if (n is PredefinedTypeSyntax typeSyntax)
+                    Parent.ReturnTypeName = typeSyntax.ToString();
+                else if (n is IdentifierNameSyntax nameSyntax)
+                    Parent.ReturnTypeName = nameSyntax.ToString();
             }
+
             foreach (var child in Children)
                 child.CheckReturnType();
         }
+
         internal void CheckAttributes()
         {
             //Checking for attributes only on classes, methods and properties.
@@ -375,6 +469,7 @@ namespace CodeSearchTree
                 CreateChildren(codeNode, n);
             }
         }
+
         /// <summary>
         /// Search expression that allocates this node from root.
         /// </summary>
@@ -422,6 +517,7 @@ namespace CodeSearchTree
                 return ret;
             }
         }
+
         /// <summary>
         /// Same as FullPath but with name guards where possible.
         /// </summary>
