@@ -74,20 +74,26 @@
         
         public TypedSearchNode VarDeclarator =>
             new TypedSearchNode(NodeType.VariableDeclaratorSyntaxNode, OwnerNode.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch)));
-        //End typed search.
         
-        public Node SearchResult => OwnerNode?.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch));
+        //End typed search.
         
         private NodeType NodeTypeSearch { get; }
         
         private ITypedSearch OwnerNode { get; }
-        
-        internal TypedSearchNode(NodeType nodeTypeSearch, ITypedSearch ownerNode) { NodeTypeSearch = nodeTypeSearch; OwnerNode = ownerNode; }
+
+        internal TypedSearchNode(NodeType nodeTypeSearch, ITypedSearch ownerNode)
+        {
+            NodeTypeSearch = nodeTypeSearch;
+            OwnerNode = ownerNode;
+        }
         
         public Node this[int index] =>
             OwnerNode?.GetChild(SearchNode.CreateSearchByTypeAndIndex(NodeTypeSearch, index));
         
         public Node this[string name] =>
             OwnerNode?.GetChild(SearchNode.Create(NodeTypeSearch, name));
+
+        public Node SearchResult =>
+            OwnerNode?.GetChild(SearchNode.CreateSearchByType(NodeTypeSearch));
     }
 }

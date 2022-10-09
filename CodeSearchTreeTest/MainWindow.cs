@@ -2,31 +2,23 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
 using CodeSearchTree;
 
 namespace CodeSearchTreeTest
 {
-    public partial class Form1 : Form
+    public partial class MainWindow : Form
     {
         private NodeList _codeTree;
         private string ToolStripSelectedProperty { get; set; } = "FullPath";
 
-        public Form1()
+        public MainWindow()
         {
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
-
-
-
-
-
-
             cboSearchFrom.Items.AddRange(new object[] { "Root", "Selected node", "Deep (from root)" });
             cboSearchFrom.SelectedIndex = 0;
 
@@ -48,6 +40,7 @@ namespace CodeSearchTreeTest
         {
             foreach (var i in ddProperty.DropDownItems)
                 ((ToolStripMenuItem)i).Checked = false;
+            
             var m = (ToolStripMenuItem)sender;
             m.Checked = true;
             ToolStripSelectedProperty = m.Text ?? "";
@@ -59,14 +52,15 @@ namespace CodeSearchTreeTest
             _codeTree = Node.CreateTreeFromFile(filename);
             treeView1.BeginUpdate();
             treeView1.Nodes.Clear();
+            
             foreach (var codeTreeNode in _codeTree)
             {
                 var treeviewNode = treeView1.Nodes.Add(codeTreeNode.ToString());
                 treeviewNode.Tag = codeTreeNode;
                 ConstructChildren(treeviewNode, codeTreeNode);
             }
-            treeView1.EndUpdate(); //Detta är av någon märklig anlednign leading för treeView1.EndUpdate();
 
+            treeView1.EndUpdate(); //Detta är av någon märklig anlednign leading för treeView1.EndUpdate();
         }
 
         private void ConstructChildren(TreeNode parentTreeview, Node parentCode)
@@ -82,14 +76,16 @@ namespace CodeSearchTreeTest
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             propertyGrid1.SelectedObject = e.Node.Tag as Node;
+            
             if (cboViewSource.SelectedIndex == 1)
-                viewSourceToolStripMenuItem_Click(sender, new EventArgs());
+                viewSourceToolStripMenuItem_Click(sender, EventArgs.Empty);
+            
             RefreshStatusLabel();
         }
 
         private void RefreshStatusLabel() =>
             lblProperty.Text = (propertyGrid1.SelectedObject is Node)
-                ? $"{ToolStripSelectedProperty}: {(((Node)propertyGrid1.SelectedObject).GetType().GetProperty(ToolStripSelectedProperty).GetValue((Node)propertyGrid1.SelectedObject, null) as string ?? "")}"
+                ? $"{ToolStripSelectedProperty}: {((Node)propertyGrid1.SelectedObject).GetType().GetProperty(ToolStripSelectedProperty).GetValue((Node)propertyGrid1.SelectedObject, null) as string ?? ""}"
                 : $"{ToolStripSelectedProperty}: [Nothing is selected]";
 
         private void DoSearch(string search)
@@ -98,20 +94,26 @@ namespace CodeSearchTreeTest
             var searchFromSelected = cboSearchFrom.SelectedIndex == 1 && treeView1.SelectedNode != null;
             var deepSearch = cboSearchFrom.SelectedIndex == 2;
             TreeNode n = null;
+
             if (searchFromSelected)
+            {
                 n = treeView1.SelectedNode;
+            }
             else
             {
                 //Både deep (rekrusiv) och root utgår från rooten.
                 if (treeView1.Nodes.Count > 0)
                     n = treeView1.Nodes[0];
             }
+            
             if (n == null)
             {
                 txtInput.WriteLine("No document loaded.");
                 return;
             }
+            
             var node = n.Tag as Node;
+            
             if (node == null)
             {
                 txtInput.WriteLine("No document loaded.");
@@ -126,6 +128,7 @@ namespace CodeSearchTreeTest
                          : deepSearch
                          ? _codeTree.DeepSearch(search).FirstOrDefault() //Rekrusiv sökning från rooten.
                          : _codeTree.GetChild(search); //Korrekt sökväg från rooten.
+                
                 txtResult.Text = @"RESULT:
 ";
                 if (resp == null)
@@ -134,22 +137,28 @@ namespace CodeSearchTreeTest
                     txtInput.WriteLine("Nothing.");
                     return;
                 }
+                
                 var oneLineResult = System.Text.RegularExpressions.Regex.Replace(resp.Source, @"\s+", " ").Trim();
+                
                 if (oneLineResult.Length > 20)
                     oneLineResult = ($"{oneLineResult.Substring(0, 20).Trim()}...");
+                
                 txtInput.WriteLine($"{oneLineResult} ({resp.Source.Length} characters)");
                 txtResult.AppendText(resp.Source);
                 txtResult.AppendText("\n");
+                
                 if (resp.LeadingTrivia.Count > 0)
                 {
                     txtResult.AppendText("\nLEADING:\n");
                     resp.LeadingTrivia.ForEach(x => txtResult.AppendText(x + "\n"));
                 }
+                
                 if (resp.TrailingTrivia.Count > 0)
                 {
                     txtResult.AppendText("\nTRAILING:\n");
                     resp.TrailingTrivia.ForEach(x => txtResult.AppendText(x + "\n"));
                 }
+                
                 txtResult.SelectionStart = 0;
                 txtResult.ScrollToCaret();
 #if !DEBUG
@@ -176,7 +185,7 @@ namespace CodeSearchTreeTest
 
         private void treeView1_DragDrop(object sender, DragEventArgs e)
         {
-            if (!(e.Data.GetDataPresent("FileNameW")))
+            if (!e.Data.GetDataPresent("FileNameW"))
             {
                 MessageBox.Show(@"Nothing loadable found.", @"Open file", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
@@ -214,10 +223,12 @@ namespace CodeSearchTreeTest
         {
             var currentButton = (int)e.Button;
             const int rightButton = (int)MouseButtons.Right;
+            
             if ((currentButton & rightButton) <= 0)
                 return;
 
             var n = treeView1.GetNodeAt(e.X, e.Y);
+            
             if (!(n?.Tag is Node))
                 return;
 
@@ -227,9 +238,9 @@ namespace CodeSearchTreeTest
 
         private void viewSourceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var n = treeView1.SelectedNode?.Tag as Node;
-            if (n == null)
+            if (!(treeView1.SelectedNode?.Tag is Node n))
                 return;
+            
             txtResult.WordWrap = false;
             txtResult.Text = n.Source;
         }
@@ -287,9 +298,10 @@ ns/cls/property[#string]";
         {
             txtResult.Text = "";
             txtResult.WordWrap = false;
-            var n = treeView1.SelectedNode.Tag as Node;
-            if (n == null)
+
+            if (!(treeView1.SelectedNode.Tag is Node n))
                 return;
+            
             txtResult.Text = n.RoslynNodePropertiesString;
         }
 

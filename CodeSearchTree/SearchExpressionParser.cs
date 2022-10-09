@@ -45,21 +45,21 @@ namespace CodeSearchTree
                     var open = part.IndexOf('[');
                     var close = part.IndexOf(']');
                     var attributeName = part.Substring(open + 2, close - (open + 2)).Trim();
-                    ret.Add(SearchNode.CerateSearchByTypeAndAttribute(KeywordToEnum(part.Substring(0, open)), attributeName));
+                    ret.Add(SearchNode.CreateSearchByTypeAndAttribute(KeywordToEnum(part.Substring(0, open)), attributeName));
                 }
                 else if (Regex.IsMatch(part, withReturnType))
                 {
                     var open = part.IndexOf('[');
                     var close = part.IndexOf(']');
                     var returnType = part.Substring(open + 2, close - (open + 2)).Trim();
-                    ret.Add(SearchNode.CerateSearchByTypeAndReturnType(KeywordToEnum(part.Substring(0, open)), returnType));
+                    ret.Add(SearchNode.CreateSearchByTypeAndReturnType(KeywordToEnum(part.Substring(0, open)), returnType));
                 }
                 else if (Regex.IsMatch(part, withName))
                 {
                     var open = part.IndexOf('[');
                     var close = part.IndexOf(']');
                     var name = part.Substring(open + 1, close - (open + 1)).Trim();
-                    ret.Add(SearchNode.CerateSearchByTypeAndName(KeywordToEnum(part.Substring(0, open)), name));
+                    ret.Add(SearchNode.CreateSearchByTypeAndName(KeywordToEnum(part.Substring(0, open)), name));
                 }
                 else
                     throw new Exception("Query expression contains errors.");

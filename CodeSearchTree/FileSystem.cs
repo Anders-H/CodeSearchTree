@@ -22,6 +22,7 @@ namespace CodeSearchTree
             var files = GetCsFiles(directoryName, includeChildDirectories, approximatelyMaximumResult);
             return files.Select(file => Node.CreateTreeFromFile(file.FullName)).Where(tree => tree.GetChild(searchNodes) != null).ToList();
         }
+
         /// <summary>
         /// Searches using the given search expressen in each node of the code tree of each C# file.
         /// </summary>
@@ -37,6 +38,7 @@ namespace CodeSearchTree
             var files = GetCsFiles(directoryName, includeChildDirectories, approximatelyMaximumResult);
             return files.Select(file => Node.CreateTreeFromFile(file.FullName)).Where(tree => tree.DeepSearch(searchNodes).Count > 0).ToList();
         }
+
         /// <summary>
         /// Returns all .cs files in a given directory.
         /// </summary>
@@ -48,15 +50,22 @@ namespace CodeSearchTree
         {
             var ret = new List<FileInfo>();
             var parent = new DirectoryInfo(directoryName);
-            if (!parent.Exists) return ret;
+            
+            if (!parent.Exists)
+                return ret;
+            
             ret.AddRange(parent.GetFiles().Where(x => string.Compare(x.Extension, ".cs", StringComparison.OrdinalIgnoreCase) == 0));
+            
             if (includeChildDirectories && ret.Count < approximatelyMaximumResult)
                 parent.GetDirectories().ToList().ForEach(x => AddChildFiles(x, ret, approximatelyMaximumResult));
+            
             return ret;
         }
+
         private static void AddChildFiles(DirectoryInfo parent, List<FileInfo> result, int approximatelyMaximumResult)
         {
             result.AddRange(parent.GetFiles().Where(x => string.Compare(x.Extension, ".cs", StringComparison.OrdinalIgnoreCase) == 0));
+            
             if (result.Count < approximatelyMaximumResult)
                 parent.GetDirectories().ToList().ForEach(x => AddChildFiles(x, result, approximatelyMaximumResult));
         }

@@ -9,8 +9,11 @@ namespace CodeSearchTree
             PropertyName = name;
             PropertyValue = value;
         }
+        
         public string PropertyName { get; }
+        
         public object PropertyValue { get; }
+        
         public string PropertyValueString
         {
             get
@@ -20,6 +23,8 @@ namespace CodeSearchTree
                 return propValueString.Length > 200 ? propValueString.Substring(0, 200).Trim() + "..." : propValueString;
             }
         }
-        public override string ToString() => $"{PropertyName}: {PropertyValueString}";
+        
+        public override string ToString() =>
+            $"{PropertyName}: {PropertyValueString}";
     }
 }

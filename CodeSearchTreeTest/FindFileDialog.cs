@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,8 +14,8 @@ namespace CodeSearchTreeTest
         private static extern bool PathCompactPathEx([Out] StringBuilder pszOut, string szPath, int cchMax, int dwFlags);
 
         public string SelectedFilename { get; private set; }
-        private List<System.IO.FileInfo> FileList { get; set; }
-        private List<System.IO.FileInfo> SearchResult { get; set; }
+        private List<FileInfo> FileList { get; set; }
+        private List<FileInfo> SearchResult { get; set; }
         private bool InSearch { get; set; }
         private bool CancelFlag { get; set; }
 
@@ -28,6 +29,7 @@ namespace CodeSearchTreeTest
             using (var x = new FolderBrowserDialog())
             {
                 x.SelectedPath = txtDirectory.Text;
+                
                 if (x.ShowDialog(this) == DialogResult.OK)
                     txtDirectory.Text = x.SelectedPath;
             }
@@ -37,9 +39,10 @@ namespace CodeSearchTreeTest
         {
             if (listView1.SelectedItems.Count <= 0)
                 return;
-            var selectedFile = listView1.SelectedItems[0].Tag as System.IO.FileInfo;
-            if (selectedFile == null)
+            
+            if (!(listView1.SelectedItems[0].Tag is FileInfo selectedFile))
                 return;
+            
             SelectedFilename = selectedFile.FullName;
             DialogResult = DialogResult.OK;
         }
@@ -52,11 +55,14 @@ namespace CodeSearchTreeTest
                 CancelFlag = true;
                 return;
             }
+            
             txtSearch.Text = txtSearch.Text.Trim();
-            if (txtSearch.Text == "")
+            
+            if (string.IsNullOrWhiteSpace(txtSearch.Text))
                 return;
-            bool success;
-            var nodes = CodeSearchTree.Node.ParseSearchExpression(txtSearch.Text, out success);
+
+            var nodes = CodeSearchTree.Node.ParseSearchExpression(txtSearch.Text, out var success);
+            
             if (!(success))
             {
                 MessageBox.Show(@"Search query contains errors.", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -70,11 +76,13 @@ namespace CodeSearchTreeTest
                 return;
             }
 
-            System.IO.DirectoryInfo dir;
+            DirectoryInfo dir;
+            
             try
             {
-                dir = new System.IO.DirectoryInfo(txtDirectory.Text);
-                if (!(dir.Exists))
+                dir = new DirectoryInfo(txtDirectory.Text);
+                
+                if (!dir.Exists)
                 {
                     MessageBox.Show(@"Directory does not exist.", Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
@@ -91,31 +99,34 @@ namespace CodeSearchTreeTest
             btnOK.Enabled = false;
             InSearch = true;
             Cursor = Cursors.WaitCursor;
-            var s = new Action<System.IO.DirectoryInfo, string, bool>(PerformSearch);
+            var s = new Action<DirectoryInfo, string, bool>(PerformSearch);
             s.BeginInvoke(dir, txtSearch.Text, cboScope.SelectedIndex == 1, SearchDone, null);
         }
 
         //Utför sökningen. Lyssnar på cancel-flaggan för eventuellt avbrott.
-        private void PerformSearch(System.IO.DirectoryInfo dir, string searchExpression, bool deep)
+        private void PerformSearch(DirectoryInfo dir, string searchExpression, bool deep)
         {
             try
             {
-                FileList = new List<System.IO.FileInfo>();
-                SearchResult = new List<System.IO.FileInfo>();
+                FileList = new List<FileInfo>();
+                SearchResult = new List<FileInfo>();
 
                 //Hämta C#-filerna i den angivna mappen.
                 dir.GetFiles("*.cs").ToList().ForEach(x => FileList.Add(x));
+                
                 if (CancelFlag)
                     StopSearch();
 
                 //Hämta undermappar.
                 dir.GetDirectories().ToList().ForEach(PerformSearchAddChildFilesAndFolders);
+                
                 if (CancelFlag)
                     StopSearch();
 
                 foreach (var file in FileList)
                 {
                     var tree = CodeSearchTree.Node.CreateTreeFromFile(file.FullName);
+                    
                     if (deep)
                     {
                         if (tree.DeepSearch(searchExpression).Count > 0)
@@ -138,12 +149,15 @@ namespace CodeSearchTreeTest
         }
 
         //Söker i childkataloger efter C#-filer. Anropas från PerformSearch i söktråden.
-        private void PerformSearchAddChildFilesAndFolders(System.IO.DirectoryInfo parent)
+        private void PerformSearchAddChildFilesAndFolders(DirectoryInfo parent)
         {
             parent.GetFiles("*.cs").ToList().ForEach(x => FileList.Add(x));
+            
             if (CancelFlag)
                 return;
+            
             parent.GetDirectories().ToList().ForEach(PerformSearchAddChildFilesAndFolders);
+            
             if (CancelFlag)
                 StopSearch();
         }
@@ -156,6 +170,7 @@ namespace CodeSearchTreeTest
                 Invoke(new Action(StopSearchGui));
             else
                 StopSearchGui();
+
             if (InvokeRequired)
                 Invoke(new Action(PresentSearchResult));
             else
@@ -218,12 +233,13 @@ namespace CodeSearchTreeTest
             cboScope.SelectedIndex = 0;
         }
 
-        private void txtSearch_TextChanged(object sender, EventArgs e) => btnSearch.Enabled = InSearch || !(string.IsNullOrWhiteSpace(txtSearch.Text));
+        private void txtSearch_TextChanged(object sender, EventArgs e) =>
+            btnSearch.Enabled = InSearch || !(string.IsNullOrWhiteSpace(txtSearch.Text));
 
         private void listView1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (listView1.GetItemAt(e.X, e.Y) != null)
-                btnOK_Click(sender, new EventArgs());
+                btnOK_Click(sender, EventArgs.Empty);
         }
     }
 }
